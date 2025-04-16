@@ -61,7 +61,31 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        family: {
+          blue: {
+            light: '#5D9CEC',
+            DEFAULT: '#4A89DC'
+          },
+          teal: {
+            DEFAULT: '#48CFAD'
+          },
+          coral: {
+            DEFAULT: '#FC6E51'
+          },
+          green: {
+            DEFAULT: '#5DB85B'
+          },
+          yellow: {
+            DEFAULT: '#FFCE54'
+          },
+          purple: {
+            DEFAULT: '#AC92EC'
+          },
+          pink: {
+            DEFAULT: '#EC87C0'
+          },
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
