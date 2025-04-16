@@ -7,11 +7,12 @@ import { Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AddFamilyMemberForm } from "@/components/family/AddFamilyMemberForm";
 
+// Updated initial family members with simplified roles
 const INITIAL_FAMILY_MEMBERS = [
-  { id: 1, name: "Sarah Johnson", role: "Parent (Admin)", color: "teal" },
-  { id: 2, name: "Michael Johnson", role: "Parent (Admin)", color: "blue" },
-  { id: 3, name: "Tommy Johnson", role: "Child (10 years)", color: "coral" },
-  { id: 4, name: "Emma Johnson", role: "Child (8 years)", color: "purple" },
+  { id: 1, name: "Sarah Johnson", role: "Parent", color: "teal" },
+  { id: 2, name: "Michael Johnson", role: "Parent", color: "blue" },
+  { id: 3, name: "Tommy Johnson", role: "Child", color: "coral" },
+  { id: 4, name: "Emma Johnson", role: "Child", color: "purple" },
   { id: 5, name: "Grandma Linda", role: "Extended Family", color: "green" },
   { id: 6, name: "Sarah's Work Calendar", role: "Linked Calendar", color: "yellow" },
   { id: 7, name: "Michael's Work Calendar", role: "Linked Calendar", color: "pink" },

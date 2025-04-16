@@ -53,11 +53,9 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
             <SelectValue placeholder="Select role" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Parent (Admin)">Parent (Admin)</SelectItem>
-            <SelectItem value="Child">Child</SelectItem>
-            <SelectItem value="Teen">Teen</SelectItem>
+            <SelectItem value="Parent">Parent</SelectItem>
             <SelectItem value="Extended Family">Extended Family</SelectItem>
-            <SelectItem value="Caregiver">Caregiver</SelectItem>
+            <SelectItem value="Child">Child</SelectItem>
             <SelectItem value="Linked Calendar">Linked Calendar</SelectItem>
           </SelectContent>
         </Select>
