@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import { CalendarDays, Users, Settings, Menu, X } from "lucide-react";
+import { CalendarDays, Users, Settings, Menu, X, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
       
       <nav className="flex-1 py-4">
+        <SidebarItem icon={<LayoutDashboard />} collapsed={collapsed}>Dashboard</SidebarItem>
         <SidebarItem icon={<CalendarDays />} collapsed={collapsed}>Calendar</SidebarItem>
         <SidebarItem icon={<Users />} collapsed={collapsed}>Family</SidebarItem>
         <SidebarItem icon={<Settings />} collapsed={collapsed}>Settings</SidebarItem>
@@ -48,7 +49,8 @@ interface SidebarItemProps {
 function SidebarItem({ children, icon, collapsed }: SidebarItemProps) {
   // Determine href based on menu item
   let href = "#";
-  if (children === "Calendar") href = "/";
+  if (children === "Dashboard") href = "/dashboard";
+  else if (children === "Calendar") href = "/";
   else if (children === "Family") href = "/family";
   else if (children === "Settings") href = "/settings";
 
