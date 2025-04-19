@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { format, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
+import { getEventColor } from "@/utils/colorUtils";
 
 interface DayViewProps {
   currentDate: Date;
@@ -20,11 +22,15 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
   };
 
   const formatTimeLabel = (hour: number) => {
-    return format(new Date().setHours(hour, 0, 0, 0), 'h a');
+    return format(new Date().setHours(hour, 0, 0, 0), 'HH:mm');
   };
 
-  const isWorkEvent = (event: Event) => {
-    return event.title.toLowerCase().includes('at work');
+  const getEventPosition = (event: Event) => {
+    const startMinutes = getMinutes(event.start);
+    const endMinutes = getMinutes(event.end);
+    const startPercentage = (startMinutes / 60) * 100;
+    const height = ((getHours(event.end) - getHours(event.start)) * 60 + (endMinutes - startMinutes)) / 60 * 80;
+    return { startPercentage, height };
   };
 
   return (
@@ -44,40 +50,43 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
           {hours.map(hour => (
             <div key={hour} className="grid grid-cols-2 col-span-2 h-20">
               <div className="border-r p-2 text-xs text-gray-500">
-                {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
+                {formatTimeLabel(hour)}
               </div>
               <div className="relative">
-                {getEventsForHour(hour).map((event) => (
-                  <div
-                    key={event.id}
-                    onClick={() => onEventClick(event)}
-                    className={cn(
-                      "absolute left-0 right-2 m-1 p-2 rounded text-sm cursor-pointer",
-                      isWorkEvent(event) ? "border-l-4 bg-opacity-20 h-[3px] !p-0 mt-3" : "",
-                      event.recurring && !isWorkEvent(event) ? "border-l-4" : "",
-                      "hover:bg-opacity-100 transition-opacity"
-                    )}
-                    style={{
-                      top: isWorkEvent(event) ? "0" : "auto",
-                      height: isWorkEvent(event) ? "3px" : `${getEventHeight(event)}px`,
-                      backgroundColor: getFamilyMemberColor(event.assignedTo)
-                    }}
-                  >
-                    {!isWorkEvent(event) && (
-                      <>
-                        <div className="font-semibold text-white">{event.title}</div>
-                        <div className="text-white text-xs">
-                          {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
-                        </div>
-                        {event.location && (
-                          <div className="text-white text-xs mt-1">
-                            📍 {event.location}
+                {getEventsForHour(hour).map((event) => {
+                  const { startPercentage, height } = getEventPosition(event);
+                  return (
+                    <div
+                      key={event.id}
+                      onClick={() => onEventClick(event)}
+                      className={cn(
+                        "absolute left-0 right-2 m-1 rounded text-sm cursor-pointer",
+                        event.showAsLine ? "w-1 !left-4" : "",
+                        event.recurring && !event.showAsLine ? "border-l-4" : "",
+                        "hover:opacity-80 transition-opacity"
+                      )}
+                      style={{
+                        top: `${startPercentage}%`,
+                        height: event.showAsLine ? `${height}px` : 'auto',
+                        backgroundColor: getEventColor(event.assignedTo)
+                      }}
+                    >
+                      {!event.showAsLine && (
+                        <>
+                          <div className="font-semibold text-white">{event.title}</div>
+                          <div className="text-white text-xs">
+                            {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                           </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                ))}
+                          {event.location && (
+                            <div className="text-white text-xs mt-1">
+                              📍 {event.location}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -85,27 +94,4 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to determine event height based on duration
-function getEventHeight(event: Event): number {
-  const startHour = getHours(event.start);
-  const startMinute = getMinutes(event.start);
-  const endHour = getHours(event.end);
-  const endMinute = getMinutes(event.end);
-  
-  const totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
-  return Math.max(totalMinutes / 60 * 80, 20);
-}
-
-// Helper function to get color based on family member
-function getFamilyMemberColor(member: string): string {
-  const colors: { [key: string]: string } = {
-    "Mom": "#20B2AA",
-    "Dad": "#4169E1",
-    "Tommy": "#FF7F50",
-    "Emma": "#9370DB",
-    "Everyone": "#3CB371"
-  };
-  return colors[member] || "#808080";
 }

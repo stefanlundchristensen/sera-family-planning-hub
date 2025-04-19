@@ -30,6 +30,7 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
     recurring: false,
     description: "",
     location: "",
+    showAsLine: false,
     ...initialValues
   });
 
@@ -119,6 +120,15 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
       
       <div className="flex items-center space-x-2">
         <Checkbox
+          id="showAsLine"
+          checked={event.showAsLine}
+          onCheckedChange={(checked) => handleChange("showAsLine", checked)}
+        />
+        <Label htmlFor="showAsLine">Show as vertical timeline (work hours)</Label>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Checkbox
           id="recurring"
           checked={event.recurring}
           onCheckedChange={(checked) => handleChange("recurring", !!checked)}
@@ -138,7 +148,6 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
   );
 }
 
-// Helper function to format date for datetime-local input
 function formatDatetimeLocal(date: Date | undefined) {
   if (!date) return "";
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
