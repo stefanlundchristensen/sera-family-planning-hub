@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { Event } from "@/hooks/useEvents";
+import type { Event } from "@/types/events";
+import { getEventColor } from "@/utils/colorUtils";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -33,14 +33,7 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
 
   // Helper function to get color based on family member
   const getFamilyMemberColor = (member: string): string => {
-    const colors: { [key: string]: string } = {
-      "Mom": "#20B2AA",
-      "Dad": "#4169E1",
-      "Tommy": "#FF7F50",
-      "Emma": "#9370DB",
-      "Everyone": "#3CB371"
-    };
-    return colors[member] || "#808080";
+    return getEventColor(member);
   };
 
   return (

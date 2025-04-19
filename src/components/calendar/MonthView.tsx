@@ -1,7 +1,7 @@
-
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { Event } from "@/hooks/useEvents";
+import type { Event } from "@/types/events";
+import { getEventColor } from "@/utils/colorUtils";
 
 interface MonthViewProps {
   currentDate: Date;
@@ -49,7 +49,7 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
                   key={event.id}
                   onClick={() => onEventClick(event)}
                   className="w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis"
-                  style={{ backgroundColor: getFamilyMemberColor(event.assignedTo) }}
+                  style={{ backgroundColor: getEventColor(event.assignedTo) }}
                 >
                   <span className="text-white">
                     {format(event.start, 'HH:mm')} {event.title}
@@ -65,12 +65,5 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
 }
 
 function getFamilyMemberColor(member: string): string {
-  const colors: { [key: string]: string } = {
-    "Mom": "#20B2AA",
-    "Dad": "#4169E1",
-    "Tommy": "#FF7F50",
-    "Emma": "#9370DB",
-    "Everyone": "#3CB371"
-  };
-  return colors[member] || "#808080";
+  return getEventColor(member);
 }
