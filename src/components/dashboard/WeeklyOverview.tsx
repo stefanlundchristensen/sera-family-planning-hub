@@ -1,74 +1,71 @@
+
 import { useState } from "react";
 import { format, startOfWeek, addDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-
-const MOCK_EVENTS = [
-  {
-    id: "1",
-    title: "Soccer Practice",
-    start: new Date(new Date().setHours(10, 0, 0, 0)),
-    end: new Date(new Date().setHours(11, 30, 0, 0)),
-    assignedTo: "Tommy",
-    color: "blue",
-    recurring: true
-  },
-  {
-    id: "2",
-    title: "Piano Lesson",
-    start: new Date(new Date().setHours(14, 0, 0, 0)),
-    end: new Date(new Date().setHours(15, 0, 0, 0)),
-    assignedTo: "Emma",
-    color: "purple"
-  },
-  {
-    id: "3",
-    title: "Family Dinner",
-    start: new Date(new Date().setHours(18, 0, 0, 0)),
-    end: new Date(new Date().setHours(19, 30, 0, 0)),
-    assignedTo: "Everyone",
-    color: "teal",
-    recurring: true
-  },
-  {
-    id: "4",
-    title: "Grocery Shopping",
-    start: new Date(new Date().setHours(16, 0, 0, 0)),
-    end: new Date(new Date().setHours(17, 0, 0, 0)),
-    assignedTo: "Mom",
-    color: "coral"
-  }
-];
+import { useEvents } from "@/hooks/useEvents";
+import { Button } from "@/components/ui/button";
+import { Plus, Edit, Trash } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function WeeklyOverview() {
   const [currentDate] = useState(new Date());
+  const { events, deleteEvent } = useEvents();
+  const { toast } = useToast();
   
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-  
   const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
 
   const getEventsForDay = (date: Date) => {
-    return MOCK_EVENTS.filter(event => 
+    return events.filter(event => 
       format(event.start, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
     );
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    deleteEvent(eventId);
+    toast({
+      description: "Event deleted successfully",
+    });
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
       {weekDays.map((day, index) => (
         <div key={index} className="space-y-2">
-          <h2 className={cn(
-            "text-lg font-semibold",
-            isToday(day) && "text-primary"
-          )}>
-            {format(day, 'EEEE')} <span className="text-muted-foreground font-normal">({format(day, 'MMM d')})</span>
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className={cn(
+              "text-lg font-semibold",
+              isToday(day) && "text-primary"
+            )}>
+              {format(day, 'EEEE')} <span className="text-muted-foreground font-normal">({format(day, 'MMM d')})</span>
+            </h2>
+            <Button variant="ghost" size="icon">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          
           {getEventsForDay(day).length > 0 ? (
-            <ul className="list-disc pl-4 space-y-2">
+            <ul className="space-y-2">
               {getEventsForDay(day).map((event) => (
-                <li key={event.id} className="text-sm">
-                  <span className="font-medium">{format(event.start, 'h:mm a')}:</span>{' '}
-                  {event.title}{' '}
-                  <span className="text-muted-foreground">({event.assignedTo})</span>
+                <li key={event.id} className="flex items-center justify-between group bg-background rounded-lg p-2 hover:bg-accent transition-colors">
+                  <div>
+                    <span className="font-medium">{format(event.start, 'h:mm a')}:</span>{' '}
+                    {event.title}{' '}
+                    <span className="text-muted-foreground">({event.assignedTo})</span>
+                  </div>
+                  <div className="space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-destructive" 
+                      onClick={() => handleDeleteEvent(event.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>

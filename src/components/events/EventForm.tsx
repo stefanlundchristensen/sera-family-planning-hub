@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Event } from "@/hooks/useEvents";
 
-// Mock data for family members
 const FAMILY_MEMBERS = [
   { id: "1", name: "Mom", color: "teal" },
   { id: "2", name: "Dad", color: "blue" },
@@ -16,13 +16,21 @@ const FAMILY_MEMBERS = [
 ];
 
 interface EventFormProps {
-  initialValues: any;
-  onSave: (event: any) => void;
+  initialValues?: Partial<Event>;
+  onSave: (event: Omit<Event, "id">) => void;
   onCancel: () => void;
 }
 
 export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
-  const [event, setEvent] = useState(initialValues);
+  const [event, setEvent] = useState<Partial<Event>>({
+    title: "",
+    start: new Date(),
+    end: new Date(new Date().getTime() + 60 * 60 * 1000),
+    assignedTo: "",
+    color: "blue",
+    recurring: false,
+    ...initialValues
+  });
 
   const handleChange = (field: string, value: any) => {
     setEvent({ ...event, [field]: value });
@@ -30,7 +38,7 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(event);
+    onSave(event as Omit<Event, "id">);
   };
 
   return (
@@ -89,7 +97,7 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
       </div>
       
       <div>
-        <Label htmlFor="color">Color</Label>
+        <Label>Color</Label>
         <div className="flex space-x-2 mt-2">
           {["blue", "teal", "coral", "purple", "green"].map(color => (
             <div 
@@ -107,12 +115,10 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
       <div className="flex items-center space-x-2">
         <Checkbox
           id="recurring"
-          checked={event.recurring || false}
+          checked={event.recurring}
           onCheckedChange={(checked) => handleChange("recurring", !!checked)}
         />
-        <Label htmlFor="recurring" className="cursor-pointer">
-          Recurring Event
-        </Label>
+        <Label htmlFor="recurring">Recurring Event</Label>
       </div>
       
       <div className="flex justify-end space-x-2 pt-4">
@@ -128,12 +134,11 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
 }
 
 // Helper function to format date for datetime-local input
-function formatDatetimeLocal(date: Date) {
+function formatDatetimeLocal(date: Date | undefined) {
   if (!date) return "";
-  
-  const d = new Date(date);
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-  return d.toISOString().slice(0, 16);
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
 }
 
 // Helper function to get color values
