@@ -8,5 +8,4 @@ export interface Event {
   recurring?: boolean;
   description?: string;
   location?: string;
-  showAsLine?: boolean;
 }
