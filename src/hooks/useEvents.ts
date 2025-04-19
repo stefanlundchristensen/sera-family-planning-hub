@@ -1,15 +1,15 @@
 
 import { useState } from "react";
 
-// Define color mapping for family members
+// Define color mapping for family members using SERA brand colors
 const FAMILY_MEMBER_COLORS: Record<string, string> = {
-  "Dad": "#4169E1",
-  "Mom": "#20B2AA",
-  "Sarah": "#FF7F50",
-  "Michael Jr": "#9370DB",
-  "Grandma Linda": "#3CB371",
-  "Grandpa Joe": "#DEB887",
-  "Everyone": "#808080"
+  "Dad": "#2C3E50", // Soft Deep Blue
+  "Mom": "#A3B18A", // Muted Sage Green  
+  "Sarah": "#BFD7EA", // Pale Sky Blue
+  "Michael Jr": "#6C757D", // Deep Slate Gray
+  "Grandma Linda": "#EDE0D4", // Warm Sand Beige with darker text
+  "Grandpa Joe": "#A3B18A", // Muted Sage Green variant
+  "Everyone": "#6C757D" // Deep Slate Gray
 };
 
 export interface Event {
@@ -208,7 +208,7 @@ export function useEvents() {
   };
 
   const getEventColor = (assignedTo: string) => {
-    return FAMILY_MEMBER_COLORS[assignedTo] || "gray";
+    return FAMILY_MEMBER_COLORS[assignedTo] || "#6C757D"; // Default to Deep Slate Gray
   };
 
   return {

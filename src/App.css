@@ -1,3 +1,6 @@
+
+/* Nordic design influenced App styles */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -8,35 +11,63 @@
 .logo {
   height: 6em;
   padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  transition: transform 300ms ease;
 }
 
-@keyframes logo-spin {
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* Soft animations inspired by Nordic simplicity */
+@keyframes gentle-fade {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(8px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.animate-in {
+  animation: gentle-fade 0.5s ease forwards;
 }
 
 .card {
   padding: 2em;
+  border-radius: 1rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(44, 62, 80, 0.08);
+}
+
+/* Rounded UI elements for friendlier feel */
+button, input, select, textarea {
+  border-radius: 0.75rem !important;
+}
+
+/* White space emphasis */
+.spacious {
+  padding: 2rem;
+  margin: 1.5rem 0;
+}
+
+/* Clean dividers */
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--border);
+  margin: 2rem 0;
+}
+
+/* Nordic colors for selection */
+::selection {
+  background-color: rgba(163, 177, 138, 0.4); /* Muted Sage Green with opacity */
+  color: #2C3E50; /* Soft Deep Blue */
 }
