@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function WeeklyOverview() {
   const [currentDate] = useState(new Date());
-  const { events, deleteEvent } = useEvents();
+  const { events, deleteEvent, getEventColor } = useEvents();
   const { toast } = useToast();
   
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -47,11 +47,20 @@ export function WeeklyOverview() {
           {getEventsForDay(day).length > 0 ? (
             <ul className="space-y-2">
               {getEventsForDay(day).map((event) => (
-                <li key={event.id} className="flex items-center justify-between group bg-background rounded-lg p-2 hover:bg-accent transition-colors">
+                <li 
+                  key={event.id} 
+                  className={cn(
+                    "flex items-center justify-between group rounded-lg p-2 hover:bg-accent transition-colors",
+                    `bg-family-${getEventColor(event.assignedTo)}-light`
+                  )}
+                >
                   <div>
                     <span className="font-medium">{format(event.start, 'h:mm a')}:</span>{' '}
                     {event.title}{' '}
                     <span className="text-muted-foreground">({event.assignedTo})</span>
+                    {event.location && (
+                      <div className="text-sm text-muted-foreground">📍 {event.location}</div>
+                    )}
                   </div>
                   <div className="space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button variant="ghost" size="icon" className="h-8 w-8">

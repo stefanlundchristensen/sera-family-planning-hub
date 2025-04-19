@@ -5,14 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import type { Event } from "@/hooks/useEvents";
 
 const FAMILY_MEMBERS = [
-  { id: "1", name: "Mom", color: "teal" },
-  { id: "2", name: "Dad", color: "blue" },
-  { id: "3", name: "Tommy", color: "coral" },
-  { id: "4", name: "Emma", color: "purple" },
-  { id: "5", name: "Everyone", color: "green" },
+  { id: "1", name: "Mom" },
+  { id: "2", name: "Dad" },
+  { id: "3", name: "Tommy" },
+  { id: "4", name: "Emma" },
+  { id: "5", name: "Everyone" },
 ];
 
 interface EventFormProps {
@@ -27,8 +28,9 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
     start: new Date(),
     end: new Date(new Date().getTime() + 60 * 60 * 1000),
     assignedTo: "",
-    color: "blue",
     recurring: false,
+    description: "",
+    location: "",
     ...initialValues
   });
 
@@ -95,21 +97,25 @@ export function EventForm({ initialValues, onSave, onCancel }: EventFormProps) {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div>
-        <Label>Color</Label>
-        <div className="flex space-x-2 mt-2">
-          {["blue", "teal", "coral", "purple", "green"].map(color => (
-            <div 
-              key={color} 
-              className={`w-8 h-8 rounded-full cursor-pointer border-2 ${event.color === color ? 'border-black' : 'border-transparent'}`}
-              style={{
-                backgroundColor: getColorValue(color),
-              }}
-              onClick={() => handleChange("color", color)}
-            />
-          ))}
-        </div>
+        <Label htmlFor="location">Location</Label>
+        <Input
+          id="location"
+          value={event.location}
+          onChange={(e) => handleChange("location", e.target.value)}
+          placeholder="Enter location"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={event.description}
+          onChange={(e) => handleChange("description", e.target.value)}
+          placeholder="Enter event description"
+        />
       </div>
       
       <div className="flex items-center space-x-2">
@@ -139,16 +145,4 @@ function formatDatetimeLocal(date: Date | undefined) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 16);
-}
-
-// Helper function to get color values
-function getColorValue(color: string) {
-  const colorMap: Record<string, string> = {
-    blue: "#4A89DC",
-    teal: "#48CFAD",
-    coral: "#FC6E51",
-    purple: "#AC92EC",
-    green: "#5DB85B",
-  };
-  return colorMap[color] || colorMap.blue;
 }
