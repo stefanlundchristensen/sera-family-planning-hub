@@ -44,26 +44,18 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
               {format(day, 'd')}
             </div>
             <div className="space-y-1">
-              {getEventsForDay(day).map((event) => {
-                const isWork = event.title.toLowerCase().includes('at work');
-                return (
-                  <button
-                    key={event.id}
-                    onClick={() => onEventClick(event)}
-                    className={cn(
-                      "w-full text-left text-xs rounded overflow-hidden whitespace-nowrap overflow-ellipsis",
-                      isWork ? "h-1 !p-0 my-2" : "p-1"
-                    )}
-                    style={{ backgroundColor: getEventColor(event.assignedTo) }}
-                  >
-                    {!isWork && (
-                      <span className="text-white">
-                        {format(event.start, 'HH:mm')} {event.title}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              {getEventsForDay(day).map((event) => (
+                <button
+                  key={event.id}
+                  onClick={() => onEventClick(event)}
+                  className="w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis"
+                  style={{ backgroundColor: getEventColor(event.assignedTo) }}
+                >
+                  <span className="text-white">
+                    {format(event.start, 'HH:mm')} {event.title}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         ))}
