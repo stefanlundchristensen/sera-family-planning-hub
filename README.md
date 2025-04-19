@@ -84,6 +84,29 @@ SERA exists to **bring calm and order to the chaos of family life**. The brand s
 - Always offer **clear actions** (e.g., "Tap here to plan your week").
 - Use **gentle, positive reinforcement** (e.g., "Great job! Next, let's plan your meals").
 
+### Application in Digital & Marketing
+
+#### App & Website:
+
+- Clean layouts with **white space**.
+- Soft transitions, rounded elements.
+- Emphasis on **simple interactions** (drag-and-drop, intuitive gestures).
+
+#### Marketing (Social & Ads):
+
+- Real families, natural lighting.
+- Scandinavian-style product shots (neutral tones, cozy home environments).
+- Minimalist graphic overlays (simple, soft typography).
+
+#### Print & Merch (Future Use):
+
+- Business cards: Textured, natural feel (not glossy, keeping with the brand's warmth).
+- Packaging for potential expansions (e.g., a branded planner).
+
+### Final Thoughts
+
+With this **Nordic-inspired brand identity**, SERA stands out by offering families a **calm, structured, and intuitive** digital home-management experience. The goal is to ensure that everything from the UI to the brand's messaging feels **effortless, reliable, and clear**, mirroring the mission of **bringing peace to the chaos of daily life**.
+
 ## Tech Stack
 
 - **Frontend**: React with TypeScript
@@ -105,51 +128,7 @@ src/
 │   └── dashboard/     # Dashboard components
 ├── hooks/             # Custom React hooks
 ├── lib/               # Utility functions
-├── pages/             # Page components
-└── App.tsx            # Main application component
+├── pages/            # Page components
+└── App.tsx           # Main application component
 ```
 
-## Development Roadmap
-
-### Phase 1: Core Infrastructure
-
-- [x] Project setup with Vite, React, TypeScript
-- [x] UI component library integration
-- [x] Basic layout and navigation
-- [x] Initial dashboard setup
-
-### Phase 2: Event Management (In Progress)
-
-- [x] Event data model
-- [x] Weekly overview component
-- [ ] Event creation, editing, and deletion
-- [ ] Event detail view
-- [ ] Event filtering and sorting
-
-### Phase 3: Calendar Integration
-
-- [ ] Calendar view components
-- [ ] Day, week, and month views
-- [ ] Event visualization on calendar
-- [ ] Drag-and-drop event scheduling
-
-### Phase 4: Family Member Management
-
-- [ ] Family member profiles
-- [ ] Member-specific event views
-- [ ] Permission system for family members
-- [ ] Member activity tracking
-
-### Phase 5: Notifications & Reminders
-
-- [ ] Notification system
-- [ ] Email notifications for events
-- [ ] Reminder settings
-- [ ] Push notifications
-
-### Phase 6: Mobile Optimization
-
-- [ ] Responsive design improvements
-- [ ] Touch interactions
-- [ ] Offline capability
-- [ ] Progressive Web App features
