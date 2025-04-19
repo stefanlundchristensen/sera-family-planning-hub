@@ -36,6 +36,10 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
     return getEventColor(member);
   };
 
+  const isWorkEvent = (event: Event) => {
+    return event.title.toLowerCase().includes('at work');
+  };
+
   return (
     <div className="flex flex-col flex-1 overflow-auto">
       <div className="grid grid-cols-8 border-b">
@@ -69,7 +73,7 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
             <div key={hour} className="grid grid-cols-8 col-span-8 h-20">
               {/* Time label */}
               <div className="border-r p-2 text-xs text-gray-500">
-                {formatTimeLabel(hour)}
+                {format(new Date().setHours(hour, 0, 0, 0), 'HH:mm')}
               </div>
               
               {/* Day columns */}
@@ -85,22 +89,24 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                         key={event.id}
                         onClick={() => onEventClick(event)}
                         className={cn(
-                          "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer text-white",
-                          event.recurring ? "border-l-4" : ""
+                          "absolute left-0 right-0 m-1 rounded text-xs cursor-pointer",
+                          isWorkEvent(event) ? "border-l-4 bg-opacity-20 h-[3px] !p-0 mt-2" : "p-1",
+                          event.recurring && !isWorkEvent(event) ? "border-l-4" : "",
+                          "text-white"
                         )}
                         style={{
-                          height: `${getEventHeight(event)}px`,
+                          top: isWorkEvent(event) ? "0" : "auto",
+                          height: isWorkEvent(event) ? "3px" : `${getEventHeight(event)}px`,
                           backgroundColor: getFamilyMemberColor(event.assignedTo)
                         }}
                       >
-                        <div className="font-semibold">{event.title}</div>
-                        <div>
-                          {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
-                        </div>
-                        {event.assignedTo && (
-                          <div className="text-xs opacity-90">
-                            {event.assignedTo}
-                          </div>
+                        {!isWorkEvent(event) && (
+                          <>
+                            <div className="font-semibold truncate">{event.title}</div>
+                            <div className="text-xs opacity-90">
+                              {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                            </div>
+                          </>
                         )}
                       </div>
                     ))}
