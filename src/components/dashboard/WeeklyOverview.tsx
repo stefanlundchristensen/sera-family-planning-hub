@@ -1,8 +1,6 @@
 
 import { useState } from "react";
 import { format, startOfWeek, addDays, isToday } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 
 // Using the same mock events from Calendar component for now
 const MOCK_EVENTS = [
@@ -59,46 +57,31 @@ export function WeeklyOverview() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
       {weekDays.map((day, index) => (
-        <Card key={index} className={cn(
-          "transition-colors",
-          isToday(day) && "border-primary"
-        )}>
-          <CardHeader>
-            <CardTitle className={cn(
-              "text-lg flex items-center justify-between",
-              isToday(day) && "text-primary"
-            )}>
-              <span>{format(day, 'EEEE')}</span>
-              <span className="text-sm font-normal">{format(day, 'MMM d')}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {getEventsForDay(day).map((event) => (
-              <div
-                key={event.id}
-                className={cn(
-                  "p-2 rounded-md text-sm",
-                  event.color === "blue" && "bg-family-blue-light text-white",
-                  event.color === "purple" && "bg-family-purple text-white",
-                  event.color === "teal" && "bg-family-teal text-white",
-                  event.color === "coral" && "bg-family-coral text-white"
-                )}
-              >
-                <div className="font-semibold">{event.title}</div>
-                <div className="text-xs opacity-90">
-                  {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
-                </div>
-                <div className="text-xs mt-1">{event.assignedTo}</div>
-              </div>
-            ))}
-            {getEventsForDay(day).length === 0 && (
-              <p className="text-sm text-muted-foreground">No events scheduled</p>
-            )}
-          </CardContent>
-        </Card>
+        <div key={index} className="space-y-2">
+          <h2 className={cn(
+            "text-lg font-semibold",
+            isToday(day) && "text-primary"
+          )}>
+            {format(day, 'EEEE')} <span className="text-muted-foreground font-normal">({format(day, 'MMM d')})</span>
+          </h2>
+          {getEventsForDay(day).length > 0 ? (
+            <ul className="list-disc pl-4 space-y-2">
+              {getEventsForDay(day).map((event) => (
+                <li key={event.id} className="text-sm">
+                  <span className="font-medium">{format(event.start, 'h:mm a')}:</span>{' '}
+                  {event.title}{' '}
+                  <span className="text-muted-foreground">({event.assignedTo})</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground pl-4">No events scheduled</p>
+          )}
+        </div>
       ))}
     </div>
   );
 }
+
