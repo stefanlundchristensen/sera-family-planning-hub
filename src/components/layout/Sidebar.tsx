@@ -50,7 +50,7 @@ function SidebarItem({ children, icon, collapsed }: SidebarItemProps) {
   let href = "#";
   if (children === "Calendar") href = "/";
   else if (children === "Family") href = "/family";
-  else if (children === "Settings") href = "#";
+  else if (children === "Settings") href = "/settings";
 
   return (
     <a 

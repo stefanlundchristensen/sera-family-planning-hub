@@ -5,29 +5,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface AddFamilyMemberFormProps {
+interface EditFamilyMemberFormProps {
+  member: {
+    id: number;
+    name: string;
+    role: string;
+    color: string;
+  };
   onSave: (member: any) => void;
   onCancel: () => void;
 }
 
-export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormProps) {
-  const [member, setMember] = useState({
-    name: "",
-    role: "",
-    color: "blue",
-    linkedCalendar: false
-  });
+export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMemberFormProps) {
+  const [editedMember, setEditedMember] = useState({ ...member });
 
   const handleChange = (field: string, value: any) => {
-    setMember({ ...member, [field]: value });
+    setEditedMember({ ...editedMember, [field]: value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...member,
-      id: Date.now()
-    });
+    onSave(editedMember);
   };
 
   return (
@@ -36,7 +34,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
         <Label htmlFor="name">Name</Label>
         <Input
           id="name"
-          value={member.name}
+          value={editedMember.name}
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder="Enter name"
           required
@@ -46,7 +44,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
       <div>
         <Label htmlFor="role">Role</Label>
         <Select 
-          value={member.role} 
+          value={editedMember.role} 
           onValueChange={(value) => handleChange("role", value)}
         >
           <SelectTrigger>
@@ -66,7 +64,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
           {["blue", "teal", "coral", "purple", "green", "yellow", "pink"].map(color => (
             <div 
               key={color} 
-              className={`w-8 h-8 rounded-full cursor-pointer border-2 ${member.color === color ? 'border-black' : 'border-transparent'}`}
+              className={`w-8 h-8 rounded-full cursor-pointer border-2 ${editedMember.color === color ? 'border-black' : 'border-transparent'}`}
               style={{
                 backgroundColor: getColorValue(color),
               }}
@@ -81,7 +79,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
           Cancel
         </Button>
         <Button type="submit">
-          Add Member
+          Save Changes
         </Button>
       </div>
     </form>

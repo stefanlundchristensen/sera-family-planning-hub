@@ -3,10 +3,12 @@ import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AddFamilyMemberForm } from "@/components/family/AddFamilyMemberForm";
+import { EditFamilyMemberForm } from "@/components/family/EditFamilyMemberForm";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 // Updated initial family members with simplified roles, excluding linked calendars
 const INITIAL_FAMILY_MEMBERS = [
@@ -20,10 +22,26 @@ const INITIAL_FAMILY_MEMBERS = [
 const Family = () => {
   const [familyMembers, setFamilyMembers] = useState(INITIAL_FAMILY_MEMBERS);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [isEditMemberOpen, setIsEditMemberOpen] = useState(false);
+  const [currentMember, setCurrentMember] = useState<any>(null);
 
   const handleAddMember = (newMember: any) => {
     setFamilyMembers([...familyMembers, newMember]);
     setIsAddMemberOpen(false);
+    toast.success("Family member added successfully!");
+  };
+
+  const handleEditMember = (member: any) => {
+    setCurrentMember(member);
+    setIsEditMemberOpen(true);
+  };
+
+  const handleUpdateMember = (updatedMember: any) => {
+    setFamilyMembers(familyMembers.map(member => 
+      member.id === updatedMember.id ? updatedMember : member
+    ));
+    setIsEditMemberOpen(false);
+    toast.success("Family member updated successfully!");
   };
 
   const getInitials = (name: string) => {
@@ -64,7 +82,7 @@ const Family = () => {
                 <TableCell className="font-medium">{member.name}</TableCell>
                 <TableCell>{member.role}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={() => handleEditMember(member)}>
                     <Edit className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -78,11 +96,32 @@ const Family = () => {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Add Family Member</DialogTitle>
+            <DialogDescription>
+              Add a new member to your family group.
+            </DialogDescription>
           </DialogHeader>
           <AddFamilyMemberForm 
             onSave={handleAddMember}
             onCancel={() => setIsAddMemberOpen(false)}
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditMemberOpen} onOpenChange={setIsEditMemberOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Family Member</DialogTitle>
+            <DialogDescription>
+              Update details for this family member.
+            </DialogDescription>
+          </DialogHeader>
+          {currentMember && (
+            <EditFamilyMemberForm 
+              member={currentMember}
+              onSave={handleUpdateMember}
+              onCancel={() => setIsEditMemberOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Layout>
