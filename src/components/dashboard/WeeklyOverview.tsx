@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { format, startOfWeek, addDays, isToday } from "date-fns";
+import { cn } from "@/lib/utils";
 
-// Using the same mock events from Calendar component for now
 const MOCK_EVENTS = [
   {
     id: "1",
@@ -43,13 +42,10 @@ const MOCK_EVENTS = [
 export function WeeklyOverview() {
   const [currentDate] = useState(new Date());
   
-  // Get the start of the week (Monday)
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   
-  // Create array for the week
   const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
 
-  // Get events for a specific day
   const getEventsForDay = (date: Date) => {
     return MOCK_EVENTS.filter(event => 
       format(event.start, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
@@ -84,4 +80,3 @@ export function WeeklyOverview() {
     </div>
   );
 }
-
