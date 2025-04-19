@@ -2,17 +2,7 @@
 import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
-
-// Mock data for events
-interface Event {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  assignedTo: string;
-  color: string;
-  recurring?: boolean;
-}
+import type { Event } from "@/hooks/useEvents";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -39,6 +29,18 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
       const eventDate = new Date(event.start);
       return isSameDay(eventDate, day) && getHours(eventDate) === hour;
     });
+  };
+
+  // Helper function to get color based on family member
+  const getFamilyMemberColor = (member: string): string => {
+    const colors: { [key: string]: string } = {
+      "Mom": "#20B2AA",
+      "Dad": "#4169E1",
+      "Tommy": "#FF7F50",
+      "Emma": "#9370DB",
+      "Everyone": "#3CB371"
+    };
+    return colors[member] || "#808080";
   };
 
   return (
@@ -85,20 +87,18 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                     "border-r h-full relative",
                     isToday(day) ? "bg-blue-50" : ""
                   )}>
-                    {eventsForSlot.map((event, eventIndex) => (
+                    {eventsForSlot.map((event) => (
                       <div
                         key={event.id}
                         onClick={() => onEventClick(event)}
                         className={cn(
-                          "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer",
-                          event.recurring ? "border-l-4" : "",
-                          event.color === "blue" && "bg-family-blue-light text-white border-family-blue",
-                          event.color === "teal" && "bg-family-teal text-white border-family-teal",
-                          event.color === "coral" && "bg-family-coral text-white border-family-coral",
-                          event.color === "purple" && "bg-family-purple text-white border-family-purple",
-                          event.color === "green" && "bg-family-green text-white border-family-green",
+                          "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer text-white",
+                          event.recurring ? "border-l-4" : ""
                         )}
-                        style={{height: `${getEventHeight(event)}px`}}
+                        style={{
+                          height: `${getEventHeight(event)}px`,
+                          backgroundColor: getFamilyMemberColor(event.assignedTo)
+                        }}
                       >
                         <div className="font-semibold">{event.title}</div>
                         <div>

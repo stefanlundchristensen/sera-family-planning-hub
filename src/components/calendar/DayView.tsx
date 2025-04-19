@@ -2,16 +2,7 @@
 import { useState } from "react";
 import { format, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
-
-interface Event {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  assignedTo: string;
-  recurring?: boolean;
-  location?: string;
-}
+import type { Event } from "@/hooks/useEvents";
 
 interface DayViewProps {
   currentDate: Date;

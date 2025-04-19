@@ -1,15 +1,7 @@
 
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-
-interface Event {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  assignedTo: string;
-  recurring?: boolean;
-}
+import type { Event } from "@/hooks/useEvents";
 
 interface MonthViewProps {
   currentDate: Date;
