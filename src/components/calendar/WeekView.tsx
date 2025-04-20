@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes } from "date-fns";
+import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
 import { getEventColor } from "@/utils/colorUtils";
@@ -18,11 +19,6 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
   // Hours for the day
   const hours = Array.from({ length: 24 }).map((_, i) => i);
 
-  // Format time
-  const formatTimeLabel = (hour: number) => {
-    return format(new Date().setHours(hour, 0, 0, 0), 'h a');
-  };
-
   // Get events for a specific day and hour
   const getEventsForTimeSlot = (day: Date, hour: number) => {
     return events.filter(event => {
@@ -31,8 +27,8 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
     });
   };
 
-  // Calculate event position and span
-  const getEventStyle = (event: Event) => {
+  // Calculate event position and dimensions
+  const getEventStyle = (event: Event, overlappingEvents: Event[]) => {
     const startHour = getHours(event.start);
     const startMinute = getMinutes(event.start);
     const endHour = getHours(event.end);
@@ -42,19 +38,36 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
     const height = totalHours * 80; // 80px per hour
     const top = startMinute * (80 / 60); // Convert minutes to pixels
 
+    // Calculate width based on number of overlapping events
+    const totalOverlapping = overlappingEvents.length;
+    const eventIndex = overlappingEvents.findIndex(e => e.id === event.id);
+    const width = `${100 / totalOverlapping}%`;
+    const left = `${(eventIndex * 100) / totalOverlapping}%`;
+
     return {
       height: `${height}px`,
       top: `${top}px`,
       position: 'absolute' as const,
-      left: '0',
-      right: '0',
-      margin: '1px'
+      width,
+      left,
+      zIndex: 10,
     };
+  };
+
+  // Check if events overlap
+  const findOverlappingEvents = (event: Event, dayEvents: Event[]) => {
+    return dayEvents.filter(otherEvent => 
+      areIntervalsOverlapping(
+        { start: event.start, end: event.end },
+        { start: otherEvent.start, end: otherEvent.end }
+      )
+    );
   };
 
   // Group events by day for better overlap handling
   const getEventsForDay = (day: Date) => {
-    return events.filter(event => isSameDay(new Date(event.start), day));
+    return events.filter(event => isSameDay(new Date(event.start), day))
+      .sort((a, b) => a.start.getTime() - b.start.getTime());
   };
 
   return (
@@ -95,85 +108,45 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
               {/* Day columns */}
               {weekDays.map((day, dayIndex) => {
                 const dayEvents = getEventsForDay(day);
-                const workEvents = dayEvents.filter(event => 
-                  event.title.toLowerCase().includes('work') || 
-                  event.title.toLowerCase().includes('office')
-                );
-                const otherEvents = dayEvents.filter(event => 
-                  !event.title.toLowerCase().includes('work') && 
-                  !event.title.toLowerCase().includes('office')
-                );
 
                 return (
                   <div key={dayIndex} className={cn(
                     "border-r h-full relative",
                     isToday(day) ? "bg-blue-50" : ""
                   )}>
-                    {workEvents.map((event) => {
+                    {dayEvents.map((event) => {
                       const startHour = getHours(event.start);
                       if (startHour === hour) {
+                        const overlappingEvents = findOverlappingEvents(event, dayEvents);
                         return (
                           <div
                             key={event.id}
                             onClick={() => onEventClick(event)}
                             className={cn(
-                              "rounded text-xs truncate cursor-pointer border-l-4",
-                              "hover:opacity-90"
+                              "rounded px-1 text-xs cursor-pointer",
+                              event.title.toLowerCase().includes('work') || 
+                              event.title.toLowerCase().includes('office')
+                                ? "border-l-4"
+                                : ""
                             )}
                             style={{
-                              ...getEventStyle(event),
+                              ...getEventStyle(event, overlappingEvents),
                               backgroundColor: getEventColor(event.assignedTo, event.title),
-                              zIndex: 10
                             }}
                           >
-                            <div className="p-1">
-                              <div className="font-semibold text-gray-600">
+                            <div className="p-1 overflow-hidden">
+                              <div className="font-semibold truncate">
                                 {event.title}
                               </div>
-                              <div className="text-gray-600">
+                              <div className="truncate">
                                 {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                               </div>
                               {event.assignedTo && (
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs truncate">
                                   {event.assignedTo}
                                 </div>
                               )}
                             </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                    
-                    {otherEvents.map((event) => {
-                      const startHour = getHours(event.start);
-                      if (startHour === hour) {
-                        return (
-                          <div
-                            key={event.id}
-                            onClick={() => onEventClick(event)}
-                            className={cn(
-                              "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer",
-                              event.recurring ? "border-l-4" : "",
-                              "text-white"
-                            )}
-                            style={{
-                              ...getEventStyle(event),
-                              backgroundColor: getEventColor(event.assignedTo, event.title),
-                              height: `${getEventHeight(event)}px`
-                            }}
-                          >
-                            <div className="font-semibold">
-                              {event.title}
-                            </div>
-                            <div>
-                              {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
-                            </div>
-                            {event.assignedTo && (
-                              <div className="text-xs opacity-90">
-                                {event.assignedTo}
-                              </div>
-                            )}
                           </div>
                         );
                       }
@@ -188,18 +161,4 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to determine event height based on duration
-function getEventHeight(event: Event): number {
-  const startHour = getHours(event.start);
-  const startMinute = getMinutes(event.start);
-  const endHour = getHours(event.end);
-  const endMinute = getMinutes(event.end);
-  
-  // Calculate total minutes
-  const totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
-  
-  // Convert to height (assuming 80px per hour)
-  return Math.max(totalMinutes / 60 * 80, 20); // Minimum height of 20px
 }
