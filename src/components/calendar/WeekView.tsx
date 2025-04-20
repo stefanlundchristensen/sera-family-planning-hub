@@ -1,9 +1,9 @@
 
-import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping, differenceInMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
 import { getEventColor } from "@/utils/colorUtils";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -28,12 +28,13 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
     const startMinute = getMinutes(startTime);
     
     // Calculate top position in pixels (80px per hour)
-    const hourPosition = startHour * 80;
-    const minutePosition = (startMinute / 60) * 80;
-    const top = hourPosition + minutePosition;
+    const top = (startHour * 80) + ((startMinute / 60) * 80);
     
     // Calculate height based on event duration
-    const durationMinutes = differenceInMinutes(event.end, event.start);
+    const durationMinutes = differenceInMinutes(
+      new Date(event.end), 
+      new Date(event.start)
+    );
     const height = (durationMinutes / 60) * 80; // 80px per hour
     
     // Calculate horizontal position for staggered layout
@@ -47,7 +48,7 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
       width: 'calc(100% - 24px)', // Leave space for staggering
       left: `${offset}px`,
       zIndex: eventIndex + 1,
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
     };
   };
 
@@ -55,16 +56,18 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
   const findOverlappingEvents = (event: Event, dayEvents: Event[]) => {
     return dayEvents.filter(otherEvent => 
       areIntervalsOverlapping(
-        { start: event.start, end: event.end },
-        { start: otherEvent.start, end: otherEvent.end }
+        { start: new Date(event.start), end: new Date(event.end) },
+        { start: new Date(otherEvent.start), end: new Date(otherEvent.end) }
       )
-    ).sort((a, b) => a.start.getTime() - b.start.getTime());
+    ).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   };
 
-  // Group events by day
+  // Group events by day - ensuring we only get events for the specific day
   const getEventsForDay = (day: Date) => {
-    return events.filter(event => isSameDay(new Date(event.start), day))
-      .sort((a, b) => a.start.getTime() - b.start.getTime());
+    return events.filter(event => {
+      const eventStart = new Date(event.start);
+      return isSameDay(eventStart, day);
+    }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   };
 
   return (
@@ -103,49 +106,65 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
               </div>
               
               {/* Day columns */}
-              {weekDays.map((day, dayIndex) => {
-                const dayEvents = getEventsForDay(day);
-
-                return (
-                  <div key={dayIndex} className={cn(
-                    "border-r h-full relative",
-                    isToday(day) ? "bg-blue-50" : ""
-                  )}>
-                    {dayEvents.map((event) => {
-                      const overlappingEvents = findOverlappingEvents(event, dayEvents);
-                      // We'll render each event once, regardless of hour
-                      return (
-                        <div
-                          key={event.id}
-                          onClick={() => onEventClick(event)}
-                          className={cn(
-                            "rounded-lg px-2 cursor-pointer transition-transform hover:translate-x-1",
-                            "border border-gray-200 hover:shadow-md"
-                          )}
-                          style={{
-                            ...getEventStyle(event, overlappingEvents),
-                            backgroundColor: getEventColor(event.assignedTo, event.title),
-                          }}
-                        >
-                          <div className="p-1 overflow-hidden">
-                            <div className="font-semibold truncate text-sm">
-                              {event.title}
-                            </div>
-                            <div className="text-xs opacity-90">
-                              {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
-                            </div>
-                            {event.assignedTo && (
-                              <div className="text-xs truncate mt-0.5 opacity-75">
-                                {event.assignedTo}
-                              </div>
+              {weekDays.map((day, dayIndex) => (
+                <div key={dayIndex} className={cn(
+                  "border-r h-full relative",
+                  isToday(day) ? "bg-blue-50" : ""
+                )}>
+                  {/* We'll render events in the day column, not in each hour cell */}
+                  {hour === 0 && getEventsForDay(day).map((event) => {
+                    const overlappingEvents = findOverlappingEvents(event, getEventsForDay(day));
+                    return (
+                      <HoverCard key={event.id}>
+                        <HoverCardTrigger asChild>
+                          <div
+                            onClick={() => onEventClick(event)}
+                            className={cn(
+                              "rounded-lg px-2 cursor-pointer transition-all",
+                              "border border-gray-200 hover:shadow-md"
                             )}
+                            style={{
+                              ...getEventStyle(event, overlappingEvents),
+                              backgroundColor: getEventColor(event.assignedTo, event.title),
+                            }}
+                          >
+                            <div className="p-1 overflow-hidden">
+                              <div className="font-semibold truncate text-sm">
+                                {event.title}
+                              </div>
+                              <div className="text-xs opacity-90">
+                                {format(new Date(event.start), 'HH:mm')} - {format(new Date(event.end), 'HH:mm')}
+                              </div>
+                              {event.assignedTo && (
+                                <div className="text-xs truncate mt-0.5 opacity-75">
+                                  {event.assignedTo}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-64 p-3">
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-semibold">{event.title}</h4>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(event.start), 'PPp')} - {format(new Date(event.end), 'p')}
+                            </p>
+                            {event.location && (
+                              <p className="text-xs">📍 {event.location}</p>
+                            )}
+                            {event.description && (
+                              <p className="text-xs mt-2">{event.description}</p>
+                            )}
+                            <p className="text-xs font-medium mt-1">
+                              {event.assignedTo}
+                            </p>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           ))}
         </div>
