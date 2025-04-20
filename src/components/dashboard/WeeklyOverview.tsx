@@ -6,6 +6,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getEventColor } from "@/utils/colorUtils";
 
 export function WeeklyOverview() {
   const [currentDate] = useState(new Date());
