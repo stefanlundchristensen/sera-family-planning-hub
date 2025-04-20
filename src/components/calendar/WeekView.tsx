@@ -85,15 +85,25 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                         key={event.id}
                         onClick={() => onEventClick(event)}
                         className={cn(
-                          "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer text-white",
-                          event.recurring ? "border-l-4" : ""
+                          "absolute top-0 left-0 right-0 m-1 p-1 rounded text-xs truncate cursor-pointer",
+                          event.recurring ? "border-l-4" : "",
+                          event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                            ? "text-gray-600 border border-gray-200"
+                            : "text-white"
                         )}
                         style={{
                           height: `${getEventHeight(event)}px`,
-                          backgroundColor: getFamilyMemberColor(event.assignedTo)
+                          backgroundColor: getEventColor(event.assignedTo, event.title)
                         }}
                       >
-                        <div className="font-semibold">{event.title}</div>
+                        <div className={cn(
+                          "font-semibold",
+                          event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                            ? "text-gray-600"
+                            : "text-white"
+                        )}>
+                          {event.title}
+                        </div>
                         <div>
                           {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
                         </div>

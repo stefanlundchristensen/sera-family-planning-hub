@@ -48,10 +48,21 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
                 <button
                   key={event.id}
                   onClick={() => onEventClick(event)}
-                  className="w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis"
-                  style={{ backgroundColor: getEventColor(event.assignedTo) }}
+                  className={cn(
+                    "w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis",
+                    event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                      ? "text-gray-600 border border-gray-200 bg-gray-50"
+                      : "text-white"
+                  )}
+                  style={{
+                    backgroundColor: getEventColor(event.assignedTo, event.title)
+                  }}
                 >
-                  <span className="text-white">
+                  <span className={
+                    event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                      ? "text-gray-600"
+                      : "text-white"
+                  }>
                     {format(event.start, 'HH:mm')} {event.title}
                   </span>
                 </button>

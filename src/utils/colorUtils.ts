@@ -1,4 +1,3 @@
-
 // Define color mapping for family members using SERA brand colors
 export const FAMILY_MEMBER_COLORS: Record<string, string> = {
   "Mom": "#A3B18A", // Muted Sage Green
@@ -10,6 +9,14 @@ export const FAMILY_MEMBER_COLORS: Record<string, string> = {
   "Grandpa Joe": "#A3B18A", // Muted Sage Green variant
 };
 
-export const getEventColor = (assignedTo: string) => {
+export const getEventColor = (assignedTo: string, title: string) => {
+  // Check if the event is work-related
+  const isWorkEvent = title.toLowerCase().includes('work') || 
+                     title.toLowerCase().includes('office');
+  
+  if (isWorkEvent) {
+    return '#F6F6F7'; // Light gray for work events
+  }
+  
   return FAMILY_MEMBER_COLORS[assignedTo] || "#6C757D"; // Default to Deep Slate Gray
 };

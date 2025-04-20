@@ -50,14 +50,24 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
                     className={cn(
                       "absolute top-0 left-0 right-2 m-1 p-2 rounded text-sm cursor-pointer",
                       event.recurring ? "border-l-4" : "",
-                      "bg-opacity-90 hover:bg-opacity-100 transition-opacity"
+                      "bg-opacity-90 hover:bg-opacity-100 transition-opacity",
+                      event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                        ? "text-gray-600 border border-gray-200"
+                        : "text-white"
                     )}
                     style={{
                       height: `${getEventHeight(event)}px`,
-                      backgroundColor: getFamilyMemberColor(event.assignedTo)
+                      backgroundColor: getEventColor(event.assignedTo, event.title)
                     }}
                   >
-                    <div className="font-semibold text-white">{event.title}</div>
+                    <div className={cn(
+                      "font-semibold",
+                      event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
+                        ? "text-gray-600"
+                        : "text-white"
+                    )}>
+                      {event.title}
+                    </div>
                     <div className="text-white text-xs">
                       {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
                     </div>
@@ -77,7 +87,6 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
   );
 }
 
-// Helper function to determine event height based on duration
 function getEventHeight(event: Event): number {
   const startHour = getHours(event.start);
   const startMinute = getMinutes(event.start);
@@ -88,8 +97,7 @@ function getEventHeight(event: Event): number {
   return Math.max(totalMinutes / 60 * 80, 20);
 }
 
-// Helper function to get color based on family member
-function getFamilyMemberColor(member: string): string {
+function getEventColor(member: string, title: string): string {
   const colors: { [key: string]: string } = {
     "Mom": "#20B2AA",
     "Dad": "#4169E1",
