@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -101,7 +100,7 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                           {event.title}
                         </div>
                         <div>
-                          {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                          {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                         </div>
                         {event.assignedTo && (
                           <div className="text-xs opacity-90">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format, startOfWeek, addDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -55,12 +54,12 @@ export function WeeklyOverview() {
                   )}
                   style={{
                     backgroundColor: event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                      ? "#F6F6F7" 
+                      ? `${getEventColor(event.assignedTo, event.title)}` 
                       : `${getEventColor(event.assignedTo, event.title)}20`
                   }}
                 >
                   <div>
-                    <span className="font-medium">{format(event.start, 'h:mm a')}:</span>{' '}
+                    <span className="font-medium">{format(event.start, 'HH:mm')}:</span>{' '}
                     {event.title}{' '}
                     <span className="text-muted-foreground">({event.assignedTo})</span>
                     {event.location && (
