@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping } from "date-fns";
+import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping, differenceInMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
 import { getEventColor } from "@/utils/colorUtils";
@@ -19,52 +18,45 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
   // Hours for the day
   const hours = Array.from({ length: 24 }).map((_, i) => i);
 
-  // Get events for a specific day and hour
-  const getEventsForTimeSlot = (day: Date, hour: number) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
-      return isSameDay(eventDate, day) && getHours(eventDate) === hour;
-    });
-  };
-
   // Calculate event position and dimensions
   const getEventStyle = (event: Event, overlappingEvents: Event[]) => {
     const startHour = getHours(event.start);
     const startMinute = getMinutes(event.start);
-    const endHour = getHours(event.end);
-    const endMinute = getMinutes(event.end);
     
-    const totalHours = endHour - startHour + (endMinute - startMinute) / 60;
-    const height = totalHours * 80; // 80px per hour
-    const top = startMinute * (80 / 60); // Convert minutes to pixels
-
-    // Calculate width based on number of overlapping events
-    const totalOverlapping = overlappingEvents.length;
+    // Calculate top position based on start time
+    const minutesSinceDayStart = startHour * 60 + startMinute;
+    const top = (minutesSinceDayStart * 80) / 60; // 80px per hour
+    
+    // Calculate height based on event duration
+    const durationMinutes = differenceInMinutes(event.end, event.start);
+    const height = (durationMinutes * 80) / 60; // Convert minutes to pixels
+    
+    // Calculate horizontal position for staggered layout
     const eventIndex = overlappingEvents.findIndex(e => e.id === event.id);
-    const width = `${100 / totalOverlapping}%`;
-    const left = `${(eventIndex * 100) / totalOverlapping}%`;
-
+    const offset = eventIndex * 10; // 10px offset for each overlapping event
+    
     return {
       height: `${height}px`,
       top: `${top}px`,
       position: 'absolute' as const,
-      width,
-      left,
-      zIndex: 10,
+      width: 'calc(100% - 24px)', // Leave space for staggering
+      left: `${offset}px`,
+      zIndex: eventIndex + 1,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     };
   };
 
-  // Check if events overlap
+  // Find overlapping events within the same time block
   const findOverlappingEvents = (event: Event, dayEvents: Event[]) => {
     return dayEvents.filter(otherEvent => 
       areIntervalsOverlapping(
         { start: event.start, end: event.end },
         { start: otherEvent.start, end: otherEvent.end }
       )
-    );
+    ).sort((a, b) => a.start.getTime() - b.start.getTime());
   };
 
-  // Group events by day for better overlap handling
+  // Group events by day
   const getEventsForDay = (day: Date) => {
     return events.filter(event => isSameDay(new Date(event.start), day))
       .sort((a, b) => a.start.getTime() - b.start.getTime());
@@ -115,19 +107,18 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                     isToday(day) ? "bg-blue-50" : ""
                   )}>
                     {dayEvents.map((event) => {
-                      const startHour = getHours(event.start);
-                      if (startHour === hour) {
-                        const overlappingEvents = findOverlappingEvents(event, dayEvents);
+                      const overlappingEvents = findOverlappingEvents(event, dayEvents);
+                      const startHourOfEvent = getHours(event.start);
+                      
+                      // Only render the event once at its start hour
+                      if (startHourOfEvent === hour) {
                         return (
                           <div
                             key={event.id}
                             onClick={() => onEventClick(event)}
                             className={cn(
-                              "rounded px-1 text-xs cursor-pointer",
-                              event.title.toLowerCase().includes('work') || 
-                              event.title.toLowerCase().includes('office')
-                                ? "border-l-4"
-                                : ""
+                              "rounded-lg px-2 cursor-pointer transition-transform hover:translate-x-1",
+                              "border border-gray-200"
                             )}
                             style={{
                               ...getEventStyle(event, overlappingEvents),
@@ -135,14 +126,14 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                             }}
                           >
                             <div className="p-1 overflow-hidden">
-                              <div className="font-semibold truncate">
+                              <div className="font-semibold truncate text-sm">
                                 {event.title}
                               </div>
-                              <div className="truncate">
+                              <div className="text-xs opacity-90">
                                 {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                               </div>
                               {event.assignedTo && (
-                                <div className="text-xs truncate">
+                                <div className="text-xs truncate mt-0.5 opacity-75">
                                   {event.assignedTo}
                                 </div>
                               )}
