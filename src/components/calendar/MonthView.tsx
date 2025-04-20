@@ -1,3 +1,4 @@
+
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
@@ -73,8 +74,4 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
       </div>
     </div>
   );
-}
-
-function getFamilyMemberColor(member: string): string {
-  return getEventColor(member);
 }

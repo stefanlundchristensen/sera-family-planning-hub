@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -29,11 +30,6 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
       const eventDate = new Date(event.start);
       return isSameDay(eventDate, day) && getHours(eventDate) === hour;
     });
-  };
-
-  // Helper function to get color based on family member
-  const getFamilyMemberColor = (member: string): string => {
-    return getEventColor(member);
   };
 
   return (
