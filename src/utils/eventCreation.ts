@@ -45,12 +45,12 @@ export const createWeeklyEvents = (): Event[] => {
       location: "Middle School"
     });
 
-    // Work schedules
+    // Updated work schedules
     currentWeek.push({
       id: `mom-work-${i}`,
       title: "Mom - Remote Work",
-      start: new Date(currentDay.setHours(9, 0, 0, 0)),
-      end: new Date(currentDay.setHours(17, 0, 0, 0)),
+      start: new Date(currentDay.setHours(8, 0, 0, 0)),
+      end: new Date(currentDay.setHours(15, 30, 0, 0)),
       assignedTo: "Mom",
       recurring: true,
       location: "Home Office"
@@ -59,8 +59,8 @@ export const createWeeklyEvents = (): Event[] => {
     currentWeek.push({
       id: `dad-work-${i}`,
       title: "Dad - Office",
-      start: new Date(currentDay.setHours(8, 30, 0, 0)),
-      end: new Date(currentDay.setHours(16, 30, 0, 0)),
+      start: new Date(currentDay.setHours(9, 0, 0, 0)),
+      end: new Date(currentDay.setHours(16, 0, 0, 0)),
       assignedTo: "Dad",
       recurring: true,
       location: "Downtown Office"
@@ -142,14 +142,15 @@ export const createWeeklyEvents = (): Event[] => {
   const sunday = new Date(weekStart);
   sunday.setDate(sunday.getDate() + 6);
 
+  // Replaced church with swimming
   currentWeek.push({
-    id: "church",
-    title: "Church Service",
+    id: "family-swimming",
+    title: "Family Swimming",
     start: new Date(sunday.setHours(10, 0, 0, 0)),
     end: new Date(sunday.setHours(11, 30, 0, 0)),
     assignedTo: "Everyone",
     recurring: true,
-    location: "Local Church"
+    location: "Local Pool"
   });
 
   currentWeek.push({
@@ -176,3 +177,4 @@ export const createWeeklyEvents = (): Event[] => {
 
   return currentWeek;
 };
+
