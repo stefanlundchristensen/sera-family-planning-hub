@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping, differenceInMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -20,16 +21,20 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
 
   // Calculate event position and dimensions
   const getEventStyle = (event: Event, overlappingEvents: Event[]) => {
-    const startHour = getHours(event.start);
-    const startMinute = getMinutes(event.start);
+    const startTime = new Date(event.start);
     
-    // Calculate top position based on start time
-    const minutesSinceDayStart = startHour * 60 + startMinute;
-    const top = (minutesSinceDayStart * 80) / 60; // 80px per hour
+    // Calculate top position based on hours and minutes
+    const startHour = getHours(startTime);
+    const startMinute = getMinutes(startTime);
+    
+    // Calculate top position in pixels (80px per hour)
+    const hourPosition = startHour * 80;
+    const minutePosition = (startMinute / 60) * 80;
+    const top = hourPosition + minutePosition;
     
     // Calculate height based on event duration
     const durationMinutes = differenceInMinutes(event.end, event.start);
-    const height = (durationMinutes * 80) / 60; // Convert minutes to pixels
+    const height = (durationMinutes / 60) * 80; // 80px per hour
     
     // Calculate horizontal position for staggered layout
     const eventIndex = overlappingEvents.findIndex(e => e.id === event.id);
@@ -108,40 +113,35 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
                   )}>
                     {dayEvents.map((event) => {
                       const overlappingEvents = findOverlappingEvents(event, dayEvents);
-                      const startHourOfEvent = getHours(event.start);
-                      
-                      // Only render the event once at its start hour
-                      if (startHourOfEvent === hour) {
-                        return (
-                          <div
-                            key={event.id}
-                            onClick={() => onEventClick(event)}
-                            className={cn(
-                              "rounded-lg px-2 cursor-pointer transition-transform hover:translate-x-1",
-                              "border border-gray-200"
-                            )}
-                            style={{
-                              ...getEventStyle(event, overlappingEvents),
-                              backgroundColor: getEventColor(event.assignedTo, event.title),
-                            }}
-                          >
-                            <div className="p-1 overflow-hidden">
-                              <div className="font-semibold truncate text-sm">
-                                {event.title}
-                              </div>
-                              <div className="text-xs opacity-90">
-                                {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
-                              </div>
-                              {event.assignedTo && (
-                                <div className="text-xs truncate mt-0.5 opacity-75">
-                                  {event.assignedTo}
-                                </div>
-                              )}
+                      // We'll render each event once, regardless of hour
+                      return (
+                        <div
+                          key={event.id}
+                          onClick={() => onEventClick(event)}
+                          className={cn(
+                            "rounded-lg px-2 cursor-pointer transition-transform hover:translate-x-1",
+                            "border border-gray-200 hover:shadow-md"
+                          )}
+                          style={{
+                            ...getEventStyle(event, overlappingEvents),
+                            backgroundColor: getEventColor(event.assignedTo, event.title),
+                          }}
+                        >
+                          <div className="p-1 overflow-hidden">
+                            <div className="font-semibold truncate text-sm">
+                              {event.title}
                             </div>
+                            <div className="text-xs opacity-90">
+                              {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                            </div>
+                            {event.assignedTo && (
+                              <div className="text-xs truncate mt-0.5 opacity-75">
+                                {event.assignedTo}
+                              </div>
+                            )}
                           </div>
-                        );
-                      }
-                      return null;
+                        </div>
+                      );
                     })}
                   </div>
                 );
