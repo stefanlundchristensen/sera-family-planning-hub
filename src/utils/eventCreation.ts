@@ -12,107 +12,96 @@ export const createWeeklyEvents = (): Event[] => {
     const currentDay = new Date(weekStart);
     currentDay.setDate(weekStart.getDate() + i);
 
-    // Sarah's drop-off
+    // Morning Routine Events
     currentWeek.push({
-      id: `sarah-dropoff-${i}`,
-      title: "Drop off Sarah at School",
+      id: `breakfast-${i}`,
+      title: "Family Breakfast",
+      start: new Date(currentDay.setHours(7, 0, 0, 0)),
+      end: new Date(currentDay.setHours(7, 45, 0, 0)),
+      assignedTo: "Everyone",
+      recurring: true,
+      location: "Home",
+      description: "Family breakfast time before school and work"
+    });
+
+    // School-related events
+    currentWeek.push({
+      id: `sarah-school-${i}`,
+      title: "Sarah - School",
+      start: new Date(currentDay.setHours(8, 30, 0, 0)),
+      end: new Date(currentDay.setHours(15, 0, 0, 0)),
+      assignedTo: "Sarah",
+      recurring: true,
+      location: "Primary School"
+    });
+
+    currentWeek.push({
+      id: `michael-jr-school-${i}`,
+      title: "Michael Jr - School",
       start: new Date(currentDay.setHours(8, 0, 0, 0)),
-      end: new Date(currentDay.setHours(8, 30, 0, 0)),
-      assignedTo: i % 2 === 0 ? "Dad" : "Mom",
-      recurring: true,
-      location: "Primary School"
-    });
-
-    // Michael Jr's drop-off
-    currentWeek.push({
-      id: `michael-dropoff-${i}`,
-      title: "Drop off Michael Jr at School",
-      start: new Date(currentDay.setHours(8, 15, 0, 0)),
-      end: new Date(currentDay.setHours(8, 45, 0, 0)),
-      assignedTo: i % 2 === 0 ? "Mom" : "Dad",
-      recurring: true,
-      location: "Middle School"
-    });
-
-    // Sarah's pickup
-    currentWeek.push({
-      id: `sarah-pickup-${i}`,
-      title: "Pick up Sarah from School",
-      start: new Date(currentDay.setHours(15, 0, 0, 0)),
       end: new Date(currentDay.setHours(15, 30, 0, 0)),
-      assignedTo: i % 2 === 0 ? "Grandma Linda" : "Mom",
-      recurring: true,
-      location: "Primary School"
-    });
-
-    // Michael Jr's pickup
-    currentWeek.push({
-      id: `michael-pickup-${i}`,
-      title: "Pick up Michael Jr from School",
-      start: new Date(currentDay.setHours(15, 30, 0, 0)),
-      end: new Date(currentDay.setHours(16, 0, 0, 0)),
-      assignedTo: i % 2 === 0 ? "Grandpa Joe" : "Dad",
+      assignedTo: "Michael Jr",
       recurring: true,
       location: "Middle School"
     });
 
-    // Parents' working hours
-    currentWeek.push({
-      id: `dad-work-${i}`,
-      title: "Dad at Work",
-      start: new Date(currentDay.setHours(9, 0, 0, 0)),
-      end: new Date(currentDay.setHours(17, 0, 0, 0)),
-      assignedTo: "Dad",
-      recurring: true,
-      location: "Office"
-    });
-
+    // Work schedules
     currentWeek.push({
       id: `mom-work-${i}`,
-      title: "Mom at Work",
-      start: new Date(currentDay.setHours(9, 30, 0, 0)),
-      end: new Date(currentDay.setHours(16, 30, 0, 0)),
+      title: "Mom - Remote Work",
+      start: new Date(currentDay.setHours(9, 0, 0, 0)),
+      end: new Date(currentDay.setHours(17, 0, 0, 0)),
       assignedTo: "Mom",
       recurring: true,
       location: "Home Office"
     });
 
-    // Dinner preparation
     currentWeek.push({
-      id: `dinner-${i}`,
-      title: "Prepare Family Dinner",
-      start: new Date(currentDay.setHours(17, 30, 0, 0)),
-      end: new Date(currentDay.setHours(18, 30, 0, 0)),
-      assignedTo: i % 2 === 0 ? "Mom" : "Dad",
+      id: `dad-work-${i}`,
+      title: "Dad - Office",
+      start: new Date(currentDay.setHours(8, 30, 0, 0)),
+      end: new Date(currentDay.setHours(16, 30, 0, 0)),
+      assignedTo: "Dad",
       recurring: true,
-      location: "Home",
-      description: "Family dinner preparation"
+      location: "Downtown Office"
     });
 
     // After-school activities
     if (i % 2 === 0) { // Monday, Wednesday, Friday
       currentWeek.push({
-        id: `sarah-swimming-${i}`,
-        title: "Sarah's Swimming Practice",
+        id: `sarah-piano-${i}`,
+        title: "Sarah - Piano Lesson",
         start: new Date(currentDay.setHours(16, 0, 0, 0)),
         end: new Date(currentDay.setHours(17, 0, 0, 0)),
         assignedTo: "Sarah",
         recurring: true,
-        location: "Community Pool"
+        location: "Music School"
       });
     }
 
     if (i % 2 === 1) { // Tuesday, Thursday
       currentWeek.push({
-        id: `michael-basketball-${i}`,
-        title: "Michael Jr's Basketball Practice",
-        start: new Date(currentDay.setHours(16, 30, 0, 0)),
+        id: `michael-soccer-${i}`,
+        title: "Michael Jr - Soccer Practice",
+        start: new Date(currentDay.setHours(16, 0, 0, 0)),
         end: new Date(currentDay.setHours(17, 30, 0, 0)),
         assignedTo: "Michael Jr",
         recurring: true,
-        location: "School Gym"
+        location: "Sports Center"
       });
     }
+
+    // Evening activities
+    currentWeek.push({
+      id: `dinner-${i}`,
+      title: "Family Dinner",
+      start: new Date(currentDay.setHours(18, 30, 0, 0)),
+      end: new Date(currentDay.setHours(19, 30, 0, 0)),
+      assignedTo: "Everyone",
+      recurring: true,
+      location: "Home",
+      description: "Family dinner time"
+    });
   }
 
   // Weekend activities
@@ -120,38 +109,69 @@ export const createWeeklyEvents = (): Event[] => {
   saturday.setDate(saturday.getDate() + 5);
 
   currentWeek.push({
-    id: "sarah-art-class",
-    title: "Sarah's Art Class",
+    id: "weekend-grocery",
+    title: "Grocery Shopping",
     start: new Date(saturday.setHours(10, 0, 0, 0)),
     end: new Date(saturday.setHours(11, 30, 0, 0)),
+    assignedTo: "Mom",
+    recurring: true,
+    location: "Supermarket"
+  });
+
+  currentWeek.push({
+    id: "sarah-art",
+    title: "Sarah - Art Class",
+    start: new Date(saturday.setHours(13, 0, 0, 0)),
+    end: new Date(saturday.setHours(14, 30, 0, 0)),
     assignedTo: "Sarah",
     recurring: true,
     location: "Art Center"
   });
 
   currentWeek.push({
-    id: "michael-coding-class",
-    title: "Michael Jr's Coding Class",
-    start: new Date(saturday.setHours(13, 0, 0, 0)),
-    end: new Date(saturday.setHours(14, 30, 0, 0)),
-    assignedTo: "Michael Jr",
-    recurring: true,
-    location: "Learning Center"
-  });
-
-  // Sunday family dinner
-  const sunday = new Date(weekStart);
-  sunday.setDate(sunday.getDate() + 6);
-  
-  currentWeek.push({
-    id: "family-dinner-sunday",
-    title: "Sunday Family Dinner",
-    start: new Date(sunday.setHours(18, 0, 0, 0)),
-    end: new Date(sunday.setHours(20, 0, 0, 0)),
+    id: "family-movie",
+    title: "Family Movie Night",
+    start: new Date(saturday.setHours(19, 0, 0, 0)),
+    end: new Date(saturday.setHours(21, 0, 0, 0)),
     assignedTo: "Everyone",
     recurring: true,
     location: "Home",
-    description: "Weekly family gathering"
+    description: "Weekly family movie night"
+  });
+
+  const sunday = new Date(weekStart);
+  sunday.setDate(sunday.getDate() + 6);
+
+  currentWeek.push({
+    id: "church",
+    title: "Church Service",
+    start: new Date(sunday.setHours(10, 0, 0, 0)),
+    end: new Date(sunday.setHours(11, 30, 0, 0)),
+    assignedTo: "Everyone",
+    recurring: true,
+    location: "Local Church"
+  });
+
+  currentWeek.push({
+    id: "sunday-brunch",
+    title: "Family Brunch",
+    start: new Date(sunday.setHours(12, 0, 0, 0)),
+    end: new Date(sunday.setHours(13, 30, 0, 0)),
+    assignedTo: "Everyone",
+    recurring: true,
+    location: "Home",
+    description: "Weekly family brunch"
+  });
+
+  currentWeek.push({
+    id: "park-visit",
+    title: "Park Visit",
+    start: new Date(sunday.setHours(14, 0, 0, 0)),
+    end: new Date(sunday.setHours(16, 0, 0, 0)),
+    assignedTo: "Everyone",
+    recurring: true,
+    location: "Central Park",
+    description: "Family outdoor time"
   });
 
   return currentWeek;
