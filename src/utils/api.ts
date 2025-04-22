@@ -1,3 +1,4 @@
+
 import { Event, FamilyMember } from '@/types/store';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api';
@@ -17,6 +18,64 @@ const setCachedData = (key: string, data: any) => {
   cache.set(key, { data, timestamp: Date.now() });
 };
 
+// --- Interceptor logic ---
+type RequestInterceptor = (input: RequestInfo, init?: RequestInit) => Promise<[RequestInfo, RequestInit?]>;
+type ResponseInterceptor = (response: Response) => Promise<Response>;
+
+const requestInterceptors: RequestInterceptor[] = [];
+const responseInterceptors: ResponseInterceptor[] = [];
+
+// Example interceptor: you can expand (e.g., add auth token)
+// Adds a request logging interceptor
+requestInterceptors.push(async (input, init) => {
+  // For demonstration, just log every request
+  // console.log("API Request:", input, init);
+  return [input, init];
+});
+
+// Example response interceptor for error normalization
+responseInterceptors.push(async (response) => {
+  if (!response.ok) {
+    let errorMsg = 'API Error';
+    try {
+      const data = await response.json();
+      errorMsg = data?.message || data?.error || errorMsg;
+    } catch {
+      // ignore body errors
+    }
+    throw new Error(errorMsg);
+  }
+  return response;
+});
+
+// Run all request interceptors
+async function runRequestInterceptors(input: RequestInfo, init?: RequestInit) {
+  let req: [RequestInfo, RequestInit?] = [input, init];
+  for (const interceptor of requestInterceptors) {
+    req = await interceptor(req[0], req[1]);
+  }
+  return req;
+}
+
+// Run all response interceptors
+async function runResponseInterceptors(response: Response) {
+  let resp = response;
+  for (const interceptor of responseInterceptors) {
+    resp = await interceptor(resp);
+  }
+  return resp;
+}
+
+// Centralized fetchWithInterceptors function
+async function fetchWithInterceptors(
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<Response> {
+  const [newInput, newInit] = await runRequestInterceptors(input, init);
+  const response = await fetch(newInput, newInit);
+  return runResponseInterceptors(response);
+}
+
 export const api = {
   events: {
     getAll: async (): Promise<Event[]> => {
@@ -24,42 +83,38 @@ export const api = {
       const cachedData = getCachedData(cacheKey);
       if (cachedData) return cachedData;
 
-      const response = await fetch(`${API_BASE_URL}/events`);
-      if (!response.ok) throw new Error('Failed to fetch events');
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/events`);
       const data = await response.json();
       setCachedData(cacheKey, data);
       return data;
     },
 
     create: async (event: Omit<Event, 'id'>): Promise<Event> => {
-      const response = await fetch(`${API_BASE_URL}/events`, {
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(event),
       });
-      if (!response.ok) throw new Error('Failed to create event');
       const data = await response.json();
       cache.delete('events');
       return data;
     },
 
     update: async (event: Event): Promise<Event> => {
-      const response = await fetch(`${API_BASE_URL}/events/${event.id}`, {
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/events/${event.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(event),
       });
-      if (!response.ok) throw new Error('Failed to update event');
       const data = await response.json();
       cache.delete('events');
       return data;
     },
 
     delete: async (eventId: string): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+      await fetchWithInterceptors(`${API_BASE_URL}/events/${eventId}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error('Failed to delete event');
       cache.delete('events');
     },
   },
@@ -70,43 +125,39 @@ export const api = {
       const cachedData = getCachedData(cacheKey);
       if (cachedData) return cachedData;
 
-      const response = await fetch(`${API_BASE_URL}/family-members`);
-      if (!response.ok) throw new Error('Failed to fetch family members');
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/family-members`);
       const data = await response.json();
       setCachedData(cacheKey, data);
       return data;
     },
 
     create: async (member: Omit<FamilyMember, 'id'>): Promise<FamilyMember> => {
-      const response = await fetch(`${API_BASE_URL}/family-members`, {
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/family-members`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(member),
       });
-      if (!response.ok) throw new Error('Failed to create family member');
       const data = await response.json();
       cache.delete('familyMembers');
       return data;
     },
 
     update: async (member: FamilyMember): Promise<FamilyMember> => {
-      const response = await fetch(`${API_BASE_URL}/family-members/${member.id}`, {
+      const response = await fetchWithInterceptors(`${API_BASE_URL}/family-members/${member.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(member),
       });
-      if (!response.ok) throw new Error('Failed to update family member');
       const data = await response.json();
       cache.delete('familyMembers');
       return data;
     },
 
     delete: async (memberId: string): Promise<void> => {
-      const response = await fetch(`${API_BASE_URL}/family-members/${memberId}`, {
+      await fetchWithInterceptors(`${API_BASE_URL}/family-members/${memberId}`, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error('Failed to delete family member');
       cache.delete('familyMembers');
     },
   },
-}; 
+};

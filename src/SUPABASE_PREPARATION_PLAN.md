@@ -31,8 +31,8 @@ This document outlines the steps to prepare our application before integrating w
 5. **API Client Layer**
    - [x] Set up initial API client structure
    - [x] Implement caching mechanism
-   - [ ] Add request/response interceptors
-   - [ ] Ensure consistent error handling
+   - [x] Add request/response interceptors
+   - [x] Ensure consistent error handling
 
 6. **Authentication Flow**
    - [ ] Plan user authentication flow
@@ -56,3 +56,4 @@ Once the above prerequisites are met:
 - Keep the frontend working with local data until Supabase integration is complete
 - Consider implementing feature flags to switch between local and Supabase data
 - Test thoroughly after each integration step
+
