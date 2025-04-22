@@ -23,10 +23,10 @@ This document outlines the steps to prepare our application before integrating w
    - [x] Consider adding Zod schemas for runtime validation
 
 4. **UI Loading & Error States**
-   - [ ] Add proper loading indicators for async operations
-   - [ ] Implement consistent error handling UI
-   - [ ] Add toast notifications for operation success/failure
-   - [ ] Ensure all forms handle submission states properly
+   - [x] Add proper loading indicators for async operations
+   - [x] Implement consistent error handling UI
+   - [x] Add toast notifications for operation success/failure
+   - [x] Ensure all forms handle submission states properly
 
 5. **API Client Layer**
    - [x] Set up initial API client structure

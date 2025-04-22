@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface EditFamilyMemberFormProps {
   member: {
@@ -14,9 +15,11 @@ interface EditFamilyMemberFormProps {
   };
   onSave: (member: any) => void;
   onCancel: () => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMemberFormProps) {
+export function EditFamilyMemberForm({ member, onSave, onCancel, isLoading = false, error }: EditFamilyMemberFormProps) {
   const [editedMember, setEditedMember] = useState({ ...member });
 
   const handleChange = (field: string, value: any) => {
@@ -30,6 +33,9 @@ export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMem
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="rounded bg-red-100 text-red-700 px-3 py-2 mb-2 text-sm">{error}</div>
+      )}
       <div>
         <Label htmlFor="name">Name</Label>
         <Input
@@ -38,6 +44,7 @@ export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMem
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder="Enter name"
           required
+          disabled={isLoading}
         />
       </div>
       
@@ -46,6 +53,7 @@ export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMem
         <Select 
           value={editedMember.role} 
           onValueChange={(value) => handleChange("role", value)}
+          disabled={isLoading}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select role" />
@@ -75,10 +83,11 @@ export function EditFamilyMemberForm({ member, onSave, onCancel }: EditFamilyMem
       </div>
       
       <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button type="submit">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <LoadingSpinner className="w-5 h-5 mr-2" /> : null}
           Save Changes
         </Button>
       </div>

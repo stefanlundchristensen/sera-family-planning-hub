@@ -4,13 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface AddFamilyMemberFormProps {
   onSave: (member: any) => void;
   onCancel: () => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormProps) {
+export function AddFamilyMemberForm({ onSave, onCancel, isLoading = false, error }: AddFamilyMemberFormProps) {
   const [member, setMember] = useState({
     name: "",
     role: "",
@@ -32,6 +35,9 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="rounded bg-red-100 text-red-700 px-3 py-2 mb-2 text-sm">{error}</div>
+      )}
       <div>
         <Label htmlFor="name">Name</Label>
         <Input
@@ -40,6 +46,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder="Enter name"
           required
+          disabled={isLoading}
         />
       </div>
       
@@ -48,6 +55,7 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
         <Select 
           value={member.role} 
           onValueChange={(value) => handleChange("role", value)}
+          disabled={isLoading}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select role" />
@@ -77,10 +85,11 @@ export function AddFamilyMemberForm({ onSave, onCancel }: AddFamilyMemberFormPro
       </div>
       
       <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button type="submit">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <LoadingSpinner className="w-5 h-5 mr-2" /> : null}
           Add Member
         </Button>
       </div>
