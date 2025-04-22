@@ -1,7 +1,11 @@
+
 import { useCallback, useEffect } from 'react';
 import useCalendarStore from '@/lib/store';
 import { Event, FamilyMember } from '@/types/store';
 import { api } from '@/utils/api';
+import { toast } from 'sonner';
+import { validateEvent, validateFamilyMember } from '@/lib/validations';
+import { ensureDateFormat } from '@/utils/typeUtils';
 
 export const useCalendar = () => {
   const {
@@ -27,22 +31,35 @@ export const useCalendar = () => {
           api.familyMembers.getAll(),
         ]);
         
-        // Only add if not already in store (prevent duplication on hot reloads)
+        // Validate and add events if not already in store
         const existingEventIds = new Set(events.map(e => e.id));
         eventsData.forEach((event) => {
           if (!existingEventIds.has(event.id)) {
-            addEvent(event);
+            const eventWithDates = ensureDateFormat(event);
+            const validation = validateEvent(eventWithDates);
+            if (validation.success) {
+              addEvent(eventWithDates);
+            } else {
+              console.error(`Invalid event data for ID ${event.id}:`, validation.error);
+            }
           }
         });
         
+        // Validate and add family members if not already in store
         const existingMemberIds = new Set(familyMembers.map(m => m.id));
         membersData.forEach((member) => {
           if (!existingMemberIds.has(member.id)) {
-            addFamilyMember(member);
+            const validation = validateFamilyMember(member);
+            if (validation.success) {
+              addFamilyMember(member);
+            } else {
+              console.error(`Invalid family member data for ID ${member.id}:`, validation.error);
+            }
           }
         });
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to load initial data');
+        toast.error('Failed to load data');
       } finally {
         setLoading(false);
       }
@@ -55,11 +72,28 @@ export const useCalendar = () => {
     async (eventData: Omit<Event, 'id' | 'created_at' | 'updated_at'>) => {
       try {
         setLoading(true);
-        const newEvent = await api.events.create(eventData);
-        addEvent(eventData);
+        
+        // Ensure dates are properly formatted
+        const eventWithDates = ensureDateFormat(eventData);
+        
+        // Validate event data
+        const validation = validateEvent({
+          ...eventWithDates,
+          id: 'temp-id', // Add temporary ID for validation
+        });
+        
+        if (!validation.success) {
+          throw new Error('Invalid event data');
+        }
+        
+        const newEvent = await api.events.create(eventWithDates);
+        addEvent(eventWithDates);
+        toast.success('Event created successfully');
         return newEvent;
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to add event');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to add event';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -72,19 +106,32 @@ export const useCalendar = () => {
     async (event: Event) => {
       try {
         setLoading(true);
+        
+        // Ensure dates are properly formatted
+        const eventWithDates = ensureDateFormat(event);
+        
+        // Validate event data
+        const validation = validateEvent(eventWithDates);
+        if (!validation.success) {
+          throw new Error('Invalid event data');
+        }
+        
         // Optimistic update
         const originalEvent = events.find((e) => e.id === event.id);
-        updateEvent(event);
+        updateEvent(eventWithDates as Event);
 
         try {
-          await api.events.update(event);
+          await api.events.update(eventWithDates as Event);
+          toast.success('Event updated successfully');
         } catch (error) {
           // Revert optimistic update on error
           if (originalEvent) updateEvent(originalEvent);
           throw error;
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to update event');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update event';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -103,13 +150,16 @@ export const useCalendar = () => {
 
         try {
           await api.events.delete(eventId);
+          toast.success('Event deleted successfully');
         } catch (error) {
           // Revert optimistic update on error
           if (eventToDelete) addEvent(eventToDelete);
           throw error;
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to delete event');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete event';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -122,11 +172,25 @@ export const useCalendar = () => {
     async (memberData: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'>) => {
       try {
         setLoading(true);
+        
+        // Validate family member data
+        const validation = validateFamilyMember({
+          ...memberData,
+          id: 'temp-id', // Add temporary ID for validation
+        });
+        
+        if (!validation.success) {
+          throw new Error('Invalid family member data');
+        }
+        
         const newMember = await api.familyMembers.create(memberData);
         addFamilyMember(memberData);
+        toast.success('Family member added successfully');
         return newMember;
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to add family member');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to add family member';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -139,19 +203,29 @@ export const useCalendar = () => {
     async (member: FamilyMember) => {
       try {
         setLoading(true);
+        
+        // Validate family member data
+        const validation = validateFamilyMember(member);
+        if (!validation.success) {
+          throw new Error('Invalid family member data');
+        }
+        
         // Optimistic update
         const originalMember = familyMembers.find((m) => m.id === member.id);
         updateFamilyMember(member);
 
         try {
           await api.familyMembers.update(member);
+          toast.success('Family member updated successfully');
         } catch (error) {
           // Revert optimistic update on error
           if (originalMember) updateFamilyMember(originalMember);
           throw error;
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to update family member');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update family member';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -170,13 +244,16 @@ export const useCalendar = () => {
 
         try {
           await api.familyMembers.delete(memberId);
+          toast.success('Family member deleted successfully');
         } catch (error) {
           // Revert optimistic update on error
           if (memberToDelete) addFamilyMember(memberToDelete);
           throw error;
         }
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to delete family member');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete family member';
+        setError(errorMessage);
+        toast.error(errorMessage);
         throw error;
       } finally {
         setLoading(false);
@@ -190,9 +267,9 @@ export const useCalendar = () => {
     familyMembers,
     handleAddEvent,
     handleUpdateEvent,
-    handleDeleteEvent: useCalendarStore().deleteEvent,
+    handleDeleteEvent,
     handleAddFamilyMember,
-    handleUpdateFamilyMember: useCalendarStore().updateFamilyMember,
-    handleDeleteFamilyMember: useCalendarStore().deleteFamilyMember,
+    handleUpdateFamilyMember,
+    handleDeleteFamilyMember,
   };
 };

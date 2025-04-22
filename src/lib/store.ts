@@ -3,6 +3,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarState, CalendarActions, Event, FamilyMember } from '@/types/store';
+import { validateEvent, validateFamilyMember } from '@/lib/validations';
+import { ensureDateFormat } from '@/utils/typeUtils';
 
 const useCalendarStore = create<CalendarState & CalendarActions>()(
   persist(
@@ -16,34 +18,74 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
       error: null,
 
       // Actions
-      addEvent: (eventData) =>
+      addEvent: (eventData) => {
+        // Validate event data before adding
+        const eventWithDates = ensureDateFormat(eventData);
+        const validation = validateEvent({
+          ...eventWithDates,
+          id: uuidv4(), // Add temporary ID for validation
+        });
+        
+        if (!validation.success) {
+          console.error("Invalid event data:", validation.error);
+          set({ error: "Failed to add event: Invalid data" });
+          return;
+        }
+
         set((state) => ({
           events: [
             ...state.events,
             {
-              ...eventData,
+              ...eventWithDates,
               id: uuidv4(),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-            },
+            } as Event,
           ],
-        })),
+          error: null,
+        }));
+      },
 
-      updateEvent: (updatedEvent) =>
+      updateEvent: (updatedEvent) => {
+        // Validate event data before updating
+        const eventWithDates = ensureDateFormat(updatedEvent);
+        const validation = validateEvent(eventWithDates);
+        
+        if (!validation.success) {
+          console.error("Invalid event data:", validation.error);
+          set({ error: "Failed to update event: Invalid data" });
+          return;
+        }
+
         set((state) => ({
           events: state.events.map((event) =>
             event.id === updatedEvent.id 
-              ? { ...updatedEvent, updated_at: new Date().toISOString() } 
+              ? { ...eventWithDates, updated_at: new Date().toISOString() } as Event
               : event
           ),
-        })),
+          error: null,
+        }));
+      },
 
       deleteEvent: (eventId) =>
         set((state) => ({
           events: state.events.filter((event) => event.id !== eventId),
+          error: null,
         })),
 
-      addFamilyMember: (memberData) =>
+      addFamilyMember: (memberData) => {
+        // Validate family member data before adding
+        const validation = validateFamilyMember({
+          ...memberData,
+          id: uuidv4(), // Add temporary ID for validation
+        });
+        
+        if (!validation.success) {
+          console.error("Invalid family member data:", validation.error);
+          set({ error: "Failed to add family member: Invalid data" });
+          return;
+        }
+
         set((state) => ({
           familyMembers: [
             ...state.familyMembers,
@@ -52,23 +94,37 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
               id: uuidv4(),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-            },
+            } as FamilyMember,
           ],
-        })),
+          error: null,
+        }));
+      },
 
-      updateFamilyMember: (updatedMember) =>
+      updateFamilyMember: (updatedMember) => {
+        // Validate family member data before updating
+        const validation = validateFamilyMember(updatedMember);
+        
+        if (!validation.success) {
+          console.error("Invalid family member data:", validation.error);
+          set({ error: "Failed to update family member: Invalid data" });
+          return;
+        }
+
         set((state) => ({
           familyMembers: state.familyMembers.map((member) =>
             member.id === updatedMember.id 
-              ? { ...updatedMember, updated_at: new Date().toISOString() } 
+              ? { ...updatedMember, updated_at: new Date().toISOString() } as FamilyMember
               : member
           ),
-        })),
+          error: null,
+        }));
+      },
 
       deleteFamilyMember: (memberId) =>
         set((state) => ({
           familyMembers: state.familyMembers.filter((member) => member.id !== memberId),
           events: state.events.filter((event) => event.familyMemberId !== memberId),
+          error: null,
         })),
 
       setSelectedDate: (date) => set({ selectedDate: date }),

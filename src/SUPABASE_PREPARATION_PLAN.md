@@ -18,9 +18,9 @@ This document outlines the steps to prepare our application before integrating w
 
 3. **Type Definitions**
    - [x] Define core types for events and family members
-   - [ ] Ensure consistent type usage across the application
-   - [ ] Add validation for data structures
-   - [ ] Consider adding Zod schemas for runtime validation
+   - [x] Ensure consistent type usage across the application
+   - [x] Add validation for data structures
+   - [x] Consider adding Zod schemas for runtime validation
 
 4. **UI Loading & Error States**
    - [ ] Add proper loading indicators for async operations
