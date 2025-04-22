@@ -26,8 +26,21 @@ export const useCalendar = () => {
           api.events.getAll(),
           api.familyMembers.getAll(),
         ]);
-        eventsData.forEach((event) => addEvent(event));
-        membersData.forEach((member) => addFamilyMember(member));
+        
+        // Only add if not already in store (prevent duplication on hot reloads)
+        const existingEventIds = new Set(events.map(e => e.id));
+        eventsData.forEach((event) => {
+          if (!existingEventIds.has(event.id)) {
+            addEvent(event);
+          }
+        });
+        
+        const existingMemberIds = new Set(familyMembers.map(m => m.id));
+        membersData.forEach((member) => {
+          if (!existingMemberIds.has(member.id)) {
+            addFamilyMember(member);
+          }
+        });
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to load initial data');
       } finally {
@@ -36,14 +49,15 @@ export const useCalendar = () => {
     };
 
     loadInitialData();
-  }, [addEvent, addFamilyMember, setLoading, setError]);
+  }, [addEvent, addFamilyMember, events, familyMembers, setLoading, setError]);
 
   const handleAddEvent = useCallback(
-    async (eventData: Omit<Event, 'id'>) => {
+    async (eventData: Omit<Event, 'id' | 'created_at' | 'updated_at'>) => {
       try {
         setLoading(true);
         const newEvent = await api.events.create(eventData);
-        addEvent(newEvent);
+        addEvent(eventData);
+        return newEvent;
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to add event');
         throw error;
@@ -105,11 +119,12 @@ export const useCalendar = () => {
   );
 
   const handleAddFamilyMember = useCallback(
-    async (memberData: Omit<FamilyMember, 'id'>) => {
+    async (memberData: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'>) => {
       try {
         setLoading(true);
         const newMember = await api.familyMembers.create(memberData);
-        addFamilyMember(newMember);
+        addFamilyMember(memberData);
+        return newMember;
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to add family member');
         throw error;
@@ -175,9 +190,9 @@ export const useCalendar = () => {
     familyMembers,
     handleAddEvent,
     handleUpdateEvent,
-    handleDeleteEvent,
+    handleDeleteEvent: useCalendarStore().deleteEvent,
     handleAddFamilyMember,
-    handleUpdateFamilyMember,
-    handleDeleteFamilyMember,
+    handleUpdateFamilyMember: useCalendarStore().updateFamilyMember,
+    handleDeleteFamilyMember: useCalendarStore().deleteFamilyMember,
   };
-}; 
+};

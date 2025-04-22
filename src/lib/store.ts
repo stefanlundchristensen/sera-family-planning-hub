@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,6 +23,8 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
             {
               ...eventData,
               id: uuidv4(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
             },
           ],
         })),
@@ -29,7 +32,9 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
       updateEvent: (updatedEvent) =>
         set((state) => ({
           events: state.events.map((event) =>
-            event.id === updatedEvent.id ? updatedEvent : event
+            event.id === updatedEvent.id 
+              ? { ...updatedEvent, updated_at: new Date().toISOString() } 
+              : event
           ),
         })),
 
@@ -45,6 +50,8 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
             {
               ...memberData,
               id: uuidv4(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
             },
           ],
         })),
@@ -52,7 +59,9 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
       updateFamilyMember: (updatedMember) =>
         set((state) => ({
           familyMembers: state.familyMembers.map((member) =>
-            member.id === updatedMember.id ? updatedMember : member
+            member.id === updatedMember.id 
+              ? { ...updatedMember, updated_at: new Date().toISOString() } 
+              : member
           ),
         })),
 
@@ -79,4 +88,4 @@ const useCalendarStore = create<CalendarState & CalendarActions>()(
   )
 );
 
-export default useCalendarStore; 
+export default useCalendarStore;
