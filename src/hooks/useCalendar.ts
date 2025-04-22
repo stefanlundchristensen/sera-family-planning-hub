@@ -37,8 +37,8 @@ export const useCalendar = () => {
           if (!existingEventIds.has(event.id)) {
             const eventWithDates = ensureDateFormat(event);
             const validation = validateEvent(eventWithDates);
-            if (validation.success) {
-              addEvent(eventWithDates);
+            if (validation.success && validation.data) {
+              addEvent(validation.data as Event);
             } else {
               console.error(`Invalid event data for ID ${event.id}:`, validation.error);
             }
@@ -50,8 +50,8 @@ export const useCalendar = () => {
         membersData.forEach((member) => {
           if (!existingMemberIds.has(member.id)) {
             const validation = validateFamilyMember(member);
-            if (validation.success) {
-              addFamilyMember(member);
+            if (validation.success && validation.data) {
+              addFamilyMember(validation.data as FamilyMember);
             } else {
               console.error(`Invalid family member data for ID ${member.id}:`, validation.error);
             }
@@ -73,8 +73,8 @@ export const useCalendar = () => {
       try {
         setLoading(true);
         
-        // Ensure dates are properly formatted
-        const eventWithDates = ensureDateFormat(eventData);
+        // Ensure dates are properly formatted and color is set
+        const eventWithDates = ensureDateFormat(eventData) as Omit<Event, 'id' | 'created_at' | 'updated_at'>;
         
         // Validate event data
         const validation = validateEvent({
@@ -103,12 +103,12 @@ export const useCalendar = () => {
   );
 
   const handleUpdateEvent = useCallback(
-    async (event: Event) => {
+    async (event: Partial<Event> & { id: string }) => {
       try {
         setLoading(true);
         
-        // Ensure dates are properly formatted
-        const eventWithDates = ensureDateFormat(event);
+        // Ensure dates are properly formatted and color is set
+        const eventWithDates = ensureDateFormat(event) as Event;
         
         // Validate event data
         const validation = validateEvent(eventWithDates);
@@ -118,10 +118,10 @@ export const useCalendar = () => {
         
         // Optimistic update
         const originalEvent = events.find((e) => e.id === event.id);
-        updateEvent(eventWithDates as Event);
+        updateEvent(eventWithDates);
 
         try {
-          await api.events.update(eventWithDates as Event);
+          await api.events.update(eventWithDates);
           toast.success('Event updated successfully');
         } catch (error) {
           // Revert optimistic update on error

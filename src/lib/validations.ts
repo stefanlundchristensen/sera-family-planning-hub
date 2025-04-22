@@ -16,7 +16,12 @@ export const familyMemberSchema = z.object({
 });
 
 // For creating a new family member (no ID required)
-export const createFamilyMemberSchema = familyMemberSchema.omit({ id: true, created_at: true, updated_at: true });
+export const createFamilyMemberSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100),
+  color: colorSchema,
+  avatar: z.string().url().optional().nullable(),
+  role: z.enum(["Parent", "Child", "Extended Family", "Other"]).optional()
+});
 
 // Event validation schema with proper date handling
 export const eventSchema = z.object({
@@ -38,7 +43,17 @@ export const eventSchema = z.object({
 });
 
 // For creating a new event (no ID required)
-export const createEventSchema = eventSchema.omit({ id: true, created_at: true, updated_at: true });
+export const createEventSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().max(1000).optional().nullable(),
+  start: z.instanceof(Date),
+  end: z.instanceof(Date),
+  familyMemberId: z.string(),
+  color: colorSchema,
+  isRecurring: z.boolean().optional(),
+  recurringPattern: z.string().optional().nullable(),
+  location: z.string().max(200).optional().nullable(),
+});
 
 // Schema for view mode
 export const viewModeSchema = z.enum(["day", "week", "month"]);

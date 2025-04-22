@@ -22,15 +22,22 @@ export function isFamilyMember(obj: unknown): obj is FamilyMember {
  * Helper to ensure dates are properly formatted
  */
 export function ensureDateFormat(event: Partial<Event>): Partial<Event> {
-  if (!(event.start instanceof Date) && event.start) {
-    event.start = new Date(event.start);
+  const updatedEvent = { ...event };
+  
+  if (!(updatedEvent.start instanceof Date) && updatedEvent.start) {
+    updatedEvent.start = new Date(updatedEvent.start);
   }
   
-  if (!(event.end instanceof Date) && event.end) {
-    event.end = new Date(event.end);
+  if (!(updatedEvent.end instanceof Date) && updatedEvent.end) {
+    updatedEvent.end = new Date(updatedEvent.end);
   }
   
-  return event;
+  // Ensure color is set if not provided
+  if (!updatedEvent.color) {
+    updatedEvent.color = "#8B5CF6"; // Default color - vivid purple
+  }
+  
+  return updatedEvent;
 }
 
 /**
