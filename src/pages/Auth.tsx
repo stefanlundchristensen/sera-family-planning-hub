@@ -32,11 +32,6 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: {
-              name: email.split('@')[0], // Default name from email
-            },
-          },
         });
         if (error) throw error;
         toast({
