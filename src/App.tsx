@@ -11,9 +11,9 @@ import Auth from "./pages/Auth";
 import Family from "./pages/Family";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
-// Create a new query client
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,6 +26,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <Onboarding />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/dashboard"
               element={

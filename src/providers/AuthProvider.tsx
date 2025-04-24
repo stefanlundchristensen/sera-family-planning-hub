@@ -4,7 +4,6 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-// Rename the context and interfaces to avoid conflicts with the custom hook
 interface SupabaseAuthContextType {
   session: Session | null;
   user: User | null;
@@ -19,22 +18,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+
+        if (session?.user) {
+          // Check if user profile is complete
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, date_of_birth, role')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!profile?.name || !profile?.date_of_birth || !profile?.role) {
+            navigate('/onboarding');
+          } else if (window.location.pathname === '/onboarding') {
+            navigate('/dashboard');
+          }
+        }
       }
     );
 
-    // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -48,7 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Rename this hook to avoid conflicts with the custom useAuth hook
 export const useSupabaseAuth = () => {
   const context = useContext(SupabaseAuthContext);
   if (context === undefined) {
