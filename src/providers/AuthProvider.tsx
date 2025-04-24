@@ -4,13 +4,14 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-interface AuthContextType {
+// Rename the context and interfaces to avoid conflicts with the custom hook
+interface SupabaseAuthContextType {
   session: Session | null;
   user: User | null;
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -41,16 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, signOut }}>
+    <SupabaseAuthContext.Provider value={{ session, user, signOut }}>
       {children}
-    </AuthContext.Provider>
+    </SupabaseAuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+// Rename this hook to avoid conflicts with the custom useAuth hook
+export const useSupabaseAuth = () => {
+  const context = useContext(SupabaseAuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useSupabaseAuth must be used within an AuthProvider');
   }
   return context;
 };
