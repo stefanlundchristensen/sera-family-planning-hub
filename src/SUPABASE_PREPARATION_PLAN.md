@@ -1,4 +1,5 @@
 
+
 # Supabase Integration Preparation Plan
 
 This document outlines the steps to prepare our application before integrating with Supabase.
@@ -35,18 +36,35 @@ This document outlines the steps to prepare our application before integrating w
    - [x] Ensure consistent error handling
 
 6. **Authentication Flow**
-   - [ ] Plan user authentication flow
-   - [ ] Define required user profile information
+   - [x] Plan user authentication flow
+     - Will use Supabase's built-in authentication
+     - Email/password authentication method
+   - [x] Define required user profile information
+     - Name
+     - Email
+     - Date of birth (to compute ages)
+     - Type of family member (parent, child, extended family)
    - [ ] Set up protected routes
    - [ ] Implement login/registration forms
+
+## Authorization Structure
+
+- Parents will have admin privileges
+- Extended family members can create and edit events
+- Children will have view-only access
+- Only parents can invite other users to join the family
 
 ## Next Steps for Supabase Integration
 
 Once the above prerequisites are met:
 
 1. Connect the Lovable project to Supabase via the green Supabase button
-2. Set up database tables matching our data models
-3. Configure Row Level Security (RLS) policies
+2. Set up database tables matching our data models:
+   - Users (profile information)
+   - Family groups
+   - Family members (connecting users to families with proper roles)
+   - Events
+3. Configure Row Level Security (RLS) policies based on user roles
 4. Implement authentication with Supabase Auth
 5. Update API client to use Supabase client
 6. Test all CRUD operations with real database
