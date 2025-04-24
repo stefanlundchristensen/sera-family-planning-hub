@@ -5,17 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseAuth } from '@/providers/AuthProvider';
+import { DateInputPicker } from '@/components/DateInputPicker';
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
@@ -23,9 +17,11 @@ const Onboarding: React.FC = () => {
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
   const [role, setRole] = useState<'parent' | 'child' | 'extended_family'>('parent');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!user) {
       toast.error('User not found. Please log in again.');
@@ -34,6 +30,7 @@ const Onboarding: React.FC = () => {
 
     if (!name || !dateOfBirth) {
       toast.error('Please fill in all required fields');
+      setIsLoading(false);
       return;
     }
 
@@ -52,8 +49,10 @@ const Onboarding: React.FC = () => {
       toast.success('Profile updated successfully');
       navigate('/dashboard');
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
-      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,11 +79,9 @@ const Onboarding: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label>Date of Birth</Label>
-              <Calendar
-                mode="single"
-                selected={dateOfBirth}
-                onSelect={setDateOfBirth}
-                className="rounded-md border"
+              <DateInputPicker
+                date={dateOfBirth}
+                onDateChange={setDateOfBirth}
                 disabled={(date) => date > new Date()}
               />
             </div>
@@ -104,8 +101,8 @@ const Onboarding: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full">
-              Complete Profile
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Updating...' : 'Complete Profile'}
             </Button>
           </CardContent>
         </form>
