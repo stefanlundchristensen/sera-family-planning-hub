@@ -10,51 +10,70 @@ import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseAuth } from '@/providers/AuthProvider';
 import { DateInputPicker } from '@/components/DateInputPicker';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useSupabaseAuth();
+  const { user, isLoading: authLoading } = useSupabaseAuth();
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
   const [role, setRole] = useState<'parent' | 'child' | 'extended_family'>('parent');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     if (!user) {
       toast.error('User not found. Please log in again.');
+      navigate('/auth');
+      setIsSubmitting(false);
       return;
     }
 
     if (!name || !dateOfBirth) {
       toast.error('Please fill in all required fields');
-      setIsLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
     try {
+      console.log("Updating profile for user:", user.id);
+      const formattedDate = dateOfBirth.toISOString().split('T')[0];
+      console.log("Submitting data:", { name, date_of_birth: formattedDate, role });
+
       const { error } = await supabase
         .from('profiles')
         .update({
           name,
-          date_of_birth: dateOfBirth.toISOString().split('T')[0],
+          date_of_birth: formattedDate,
           role
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
 
       toast.success('Profile updated successfully');
+      console.log("Profile updated successfully, navigating to dashboard");
       navigate('/dashboard');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -101,8 +120,8 @@ const Onboarding: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Updating...' : 'Complete Profile'}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Updating...' : 'Complete Profile'}
             </Button>
           </CardContent>
         </form>
