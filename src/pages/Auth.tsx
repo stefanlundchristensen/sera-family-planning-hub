@@ -1,14 +1,14 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseAuth } from '@/providers/AuthProvider';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,8 +16,19 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
-  const { toast: legacyToast } = useToast();
-  const { isLoading: authLoading } = useSupabaseAuth();
+  const location = useLocation();
+  const { session, isLoading: authLoading } = useSupabaseAuth();
+  
+  // Check if we have a "from" state to redirect after login
+  const from = (location.state as { from?: string })?.from || '/dashboard';
+  
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (session && !authLoading) {
+      console.log("Already authenticated, redirecting");
+      navigate(from);
+    }
+  }, [session, authLoading, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +36,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
+        console.log("Attempting to login with email:", email);
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -32,6 +44,7 @@ const Auth = () => {
         if (error) throw error;
         toast.success('Logged in successfully');
       } else {
+        console.log("Attempting to sign up with email:", email);
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -50,7 +63,7 @@ const Auth = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+        <LoadingSpinner />
       </div>
     );
   }

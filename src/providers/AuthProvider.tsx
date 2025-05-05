@@ -22,8 +22,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   useEffect(() => {
-    // First check for existing session to avoid flash of login screen
+    console.log("AuthProvider initialized");
+    
+    // First set up listener for auth state changes to prevent missing events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, newSession) => {
+        console.log("Auth state changed:", event);
+        
+        // Update state synchronously to prevent React batching issues
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        
+        // Use setTimeout to defer Supabase calls to prevent deadlocks
+        if (newSession?.user) {
+          setTimeout(() => checkUserProfile(newSession.user.id), 0);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    );
+
+    // Then check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Initial session check:", currentSession ? "Found session" : "No session");
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       
@@ -34,32 +55,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // Then set up listener for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        console.log("Auth state changed:", _event);
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-
-        if (newSession?.user) {
-          checkUserProfile(newSession.user.id);
-        } else {
-          setIsLoading(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const checkUserProfile = async (userId: string) => {
     try {
+      console.log("Checking user profile for:", userId);
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('name, date_of_birth, role')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to handle case where profile might not exist
 
+      console.log("Profile check result:", profile, error);
       setIsLoading(false);
 
       // Only redirect if we're not already on the onboarding page
@@ -81,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     setIsLoading(true);
     try {
+      console.log("Signing out user");
       await supabase.auth.signOut();
       navigate('/auth');
       toast.success('Signed out successfully');
