@@ -14,7 +14,7 @@ export function Calendar() {
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
-  const { events, addEvent, updateEvent, deleteEvent } = useEvents();
+  const { events, addEvent, updateEvent } = useEvents();
 
   const handleEventClick = (event: any) => {
     setSelectedEvent(event);

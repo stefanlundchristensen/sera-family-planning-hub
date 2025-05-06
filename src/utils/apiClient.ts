@@ -1,4 +1,3 @@
-
 import type {
   ApiClient,
   ApiClientConfig,
@@ -18,12 +17,12 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 /**
  * A specialized Map that automatically expires entries after a specified duration
  */
-class CacheMap<K, V> extends Map<K, { data: V; timestamp: number }> {
+class CacheMap<K, V> {
+  private readonly cache = new Map<K, { data: V; timestamp: number }>();
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   private readonly ttl: number;
 
   constructor(ttl: number = CACHE_DURATION) {
-    super();
     this.ttl = ttl;
     this.startCleanup();
   }
@@ -41,9 +40,9 @@ class CacheMap<K, V> extends Map<K, { data: V; timestamp: number }> {
    */
   private cleanup(): void {
     const now = Date.now();
-    for (const [key, value] of this.entries()) {
+    for (const [key, value] of this.cache.entries()) {
       if (now - value.timestamp > this.ttl) {
-        this.delete(key);
+        this.cache.delete(key);
       }
     }
   }
@@ -52,12 +51,12 @@ class CacheMap<K, V> extends Map<K, { data: V; timestamp: number }> {
    * Get a value from the cache if it exists and hasn't expired
    */
   get(key: K): V | undefined {
-    const entry = super.get(key);
+    const entry = this.cache.get(key);
     if (!entry) return undefined;
 
     // Check if the entry has expired
     if (Date.now() - entry.timestamp > this.ttl) {
-      this.delete(key);
+      this.cache.delete(key);
       return undefined;
     }
 
@@ -68,7 +67,36 @@ class CacheMap<K, V> extends Map<K, { data: V; timestamp: number }> {
    * Set a value in the cache with the current timestamp
    */
   set(key: K, value: V): this {
-    return super.set(key, { data: value, timestamp: Date.now() });
+    this.cache.set(key, { data: value, timestamp: Date.now() });
+    return this;
+  }
+
+  /**
+   * Delete a value from the cache
+   */
+  delete(key: K): boolean {
+    return this.cache.delete(key);
+  }
+
+  /**
+   * Clear the entire cache
+   */
+  clear(): void {
+    this.cache.clear();
+  }
+
+  /**
+   * Get all keys in the cache
+   */
+  keys(): IterableIterator<K> {
+    return this.cache.keys();
+  }
+
+  /**
+   * Get all entries in the cache
+   */
+  entries(): IterableIterator<[K, { data: V; timestamp: number }]> {
+    return this.cache.entries();
   }
 
   /**

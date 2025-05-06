@@ -1,4 +1,5 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { api } from '../api';
 
 // Mock fetch
