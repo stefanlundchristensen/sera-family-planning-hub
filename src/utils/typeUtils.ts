@@ -37,7 +37,7 @@ export function getPropertyByPath<T extends object>(
   if (typeof path === 'string' && path.includes('.')) {
     return path
       .split('.')
-      .reduce((acc: any, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+      .reduce((acc: unknown, part) => (acc && typeof acc === 'object' && part in acc ? (acc as Record<string, unknown>)[part] : undefined), obj);
   }
   
   return obj[path as keyof T];

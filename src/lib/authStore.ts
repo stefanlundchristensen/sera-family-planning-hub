@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,6 +18,11 @@ interface Session {
   user: User;
 }
 
+// Define the auth response type
+interface AuthResponse {
+  error: string | null;
+}
+
 // Define the auth state
 interface AuthState {
   user: User | null;
@@ -28,8 +34,8 @@ interface AuthState {
 
 // Define the auth actions
 interface AuthActions {
-  register: (email: string, name: string, password: string) => Promise<{ error: string | null }>;
-  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  register: (email: string, name: string, password: string) => Promise<AuthResponse>;
+  login: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
   setUser: (user: User | null) => void;
   setSession: (session: Session | null) => void;
@@ -37,11 +43,6 @@ interface AuthActions {
 
 // Combine state and actions
 type AuthStore = AuthState & AuthActions;
-
-// Define a type for the response
-interface AuthResponse {
-  error: string | null;
-}
 
 // Create the store
 const useAuthStore = create<AuthStore>()(
@@ -54,100 +55,98 @@ const useAuthStore = create<AuthStore>()(
       isLoading: false,
       error: null,
 
-      actions: {
-        // User registration
-        register: async (email: string, name: string, _password: string): Promise<AuthResponse> => {
-          set({ isLoading: true, error: null });
+      // User registration
+      register: async (email: string, name: string, _password: string): Promise<AuthResponse> => {
+        set({ isLoading: true, error: null });
 
-          try {
-            // Simulated registration delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+          // Simulated registration delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // For demo purposes, we'll just set the user as authenticated
-            // In a real app, this would involve an API call to register the user
-            const fakeUser: User = {
-              id: uuidv4(),
-              email,
-              name,
-              role: 'parent',
-              created_at: new Date().toISOString()
-            };
+          // For demo purposes, we'll just set the user as authenticated
+          // In a real app, this would involve an API call to register the user
+          const fakeUser: User = {
+            id: uuidv4(),
+            email,
+            name,
+            role: 'parent',
+            created_at: new Date().toISOString()
+          };
 
-            set({
-              user: fakeUser,
-              session: {
-                access_token: `fake-token-${Date.now()}`,
-                expires_at: Date.now() + 3600000, // 1 hour from now
-                user: fakeUser
-              },
-              isAuthenticated: true,
-              isLoading: false
-            });
+          set({
+            user: fakeUser,
+            session: {
+              access_token: `fake-token-${Date.now()}`,
+              expires_at: Date.now() + 3600000, // 1 hour from now
+              user: fakeUser
+            },
+            isAuthenticated: true,
+            isLoading: false
+          });
 
-            return { error: null };
-          } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to register';
-            set({ error: message, isLoading: false });
-            return { error: message };
-          }
-        },
+          return { error: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to register';
+          set({ error: message, isLoading: false });
+          return { error: message };
+        }
+      },
 
-        // User login
-        login: async (email: string, _password: string): Promise<AuthResponse> => {
-          set({ isLoading: true, error: null });
+      // User login
+      login: async (email: string, _password: string): Promise<AuthResponse> => {
+        set({ isLoading: true, error: null });
 
-          try {
-            // Simulated login delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+          // Simulated login delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // For demo purposes, we'll just set the user as authenticated
-            // In a real app, this would involve an API call to authenticate the user
-            const fakeUser: User = {
-              id: uuidv4(),
-              email,
-              name: email.split('@')[0], // Use part of email as name for demo
-              role: 'parent',
-              created_at: new Date().toISOString()
-            };
+          // For demo purposes, we'll just set the user as authenticated
+          // In a real app, this would involve an API call to authenticate the user
+          const fakeUser: User = {
+            id: uuidv4(),
+            email,
+            name: email.split('@')[0], // Use part of email as name for demo
+            role: 'parent',
+            created_at: new Date().toISOString()
+          };
 
-            set({
-              user: fakeUser,
-              session: {
-                access_token: `fake-token-${Date.now()}`,
-                expires_at: Date.now() + 3600000, // 1 hour from now
-                user: fakeUser
-              },
-              isAuthenticated: true,
-              isLoading: false
-            });
+          set({
+            user: fakeUser,
+            session: {
+              access_token: `fake-token-${Date.now()}`,
+              expires_at: Date.now() + 3600000, // 1 hour from now
+              user: fakeUser
+            },
+            isAuthenticated: true,
+            isLoading: false
+          });
 
-            return { error: null };
-          } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to login';
-            set({ error: message, isLoading: false });
-            return { error: message };
-          }
-        },
+          return { error: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Failed to login';
+          set({ error: message, isLoading: false });
+          return { error: message };
+        }
+      },
 
-        // User logout
-        logout: () => {
-          set({ user: null, session: null, isAuthenticated: false });
-        },
+      // User logout
+      logout: () => {
+        set({ user: null, session: null, isAuthenticated: false });
+      },
 
-        // Set user
-        setUser: (user) => {
-          set({ user, isAuthenticated: !!user });
-        },
+      // Set user
+      setUser: (user: User | null) => {
+        set({ user, isAuthenticated: !!user });
+      },
 
-        // Set session
-        setSession: (session) => {
-          set({ session, isAuthenticated: !!session });
-        },
+      // Set session
+      setSession: (session: Session | null) => {
+        set({ session, isAuthenticated: !!session });
       },
     }),
     {
       name: 'auth-storage', // unique name
-      storage: localStorage, // Use localStorage
+      storage: typeof window !== 'undefined' ? localStorage : undefined, // Use localStorage if available
     }
   )
 );

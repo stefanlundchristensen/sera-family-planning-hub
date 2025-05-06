@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import useAuthStore from '@/lib/authStore';
-import { UserProfile, UserRole } from '@/types/auth';
+import type { UserProfile, UserRole } from '@/types/auth';
 
 export const useAuth = () => {
   const {
@@ -9,41 +9,30 @@ export const useAuth = () => {
     isAuthenticated,
     isLoading,
     error,
-    login,
     register,
+    login,
     logout,
-    updateProfile,
-    clearError,
+    setUser,
+    setSession
   } = useAuthStore();
 
   const handleLogin = useCallback(
     async (email: string, password: string) => {
-      clearError();
       return login(email, password);
     },
-    [clearError, login]
+    [login]
   );
 
   const handleRegister = useCallback(
-    async (email: string, password: string, name: string, dateOfBirth: Date, role: UserRole) => {
-      clearError();
-      return register(email, password, name, dateOfBirth, role);
+    async (email: string, password: string, name: string) => {
+      return register(email, name, password);
     },
-    [clearError, register]
+    [register]
   );
 
-  const handleLogout = useCallback(async () => {
-    clearError();
+  const handleLogout = useCallback(() => {
     return logout();
-  }, [clearError, logout]);
-
-  const handleUpdateProfile = useCallback(
-    async (profile: Partial<UserProfile>) => {
-      clearError();
-      return updateProfile(profile);
-    },
-    [clearError, updateProfile]
-  );
+  }, [logout]);
 
   // Check if user has specific role
   const hasRole = useCallback(
@@ -71,7 +60,6 @@ export const useAuth = () => {
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
-    updateProfile: handleUpdateProfile,
     hasRole,
     canEdit,
     canManageUsers,
