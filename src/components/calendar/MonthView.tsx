@@ -1,3 +1,4 @@
+
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
@@ -29,7 +30,7 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
       </div>
       
       <div className="flex-1 grid grid-cols-7 gap-px bg-muted p-2">
-        {days.map((day, dayIdx) => (
+        {days.map((day) => (
           <div
             key={day.toString()}
             className={cn(

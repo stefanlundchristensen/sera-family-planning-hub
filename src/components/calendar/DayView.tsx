@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { format, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
@@ -57,7 +57,7 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
                     )}
                     style={{
                       height: `${getEventHeight(event)}px`,
-                      backgroundColor: getEventColor(event.assignedTo, event.title)
+                      backgroundColor: getEventColor(event.assignedTo)
                     }}
                   >
                     <div className={cn(
@@ -97,7 +97,7 @@ function getEventHeight(event: Event): number {
   return Math.max(totalMinutes / 60 * 80, 20);
 }
 
-function getEventColor(member: string, title: string): string {
+function getEventColor(member: string): string {
   const colors: { [key: string]: string } = {
     "Mom": "#20B2AA",
     "Dad": "#4169E1",

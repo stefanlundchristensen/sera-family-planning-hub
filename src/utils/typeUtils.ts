@@ -30,9 +30,9 @@ export function isOneOf<T>(value: T, values: T[]): boolean {
 /**
  * Type-safe way to get a property by string path
  */
-export function getPropertyByPath<T extends object, K extends keyof T>(
+export function getPropertyByPath<T extends object>(
   obj: T, 
-  path: K | string
+  path: keyof T | string
 ): unknown {
   if (typeof path === 'string' && path.includes('.')) {
     return path
@@ -41,4 +41,17 @@ export function getPropertyByPath<T extends object, K extends keyof T>(
   }
   
   return obj[path as keyof T];
+}
+
+/**
+ * Ensure event dates are properly formatted as Date objects
+ */
+export function ensureDateFormat<T extends { start: Date | string; end: Date | string }>(
+  event: T
+): T {
+  return {
+    ...event,
+    start: event.start instanceof Date ? event.start : new Date(event.start),
+    end: event.end instanceof Date ? event.end : new Date(event.end),
+  };
 }

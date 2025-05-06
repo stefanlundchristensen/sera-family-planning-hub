@@ -36,7 +36,7 @@ export function useCalendar() {
         const eventsWithMembers: EventWithMember[] = [];
         
         if (eventsResponse.data) {
-          eventsResponse.data.forEach((event) => {
+          eventsResponse.data.forEach((event: Event) => {
             const member = membersResponse.data?.find(m => m.id === event.familyMemberId);
             eventsWithMembers.push({
               ...event,

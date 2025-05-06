@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
-import { format, addDays, startOfWeek, endOfWeek } from "date-fns";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { format, startOfWeek, endOfWeek } from "date-fns";
 
 interface CalendarHeaderProps {
   currentDate: Date;

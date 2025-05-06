@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { format, addDays, startOfWeek, isToday, isSameDay, getHours, getMinutes, areIntervalsOverlapping } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/events";
@@ -18,14 +17,6 @@ export function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
   
   // Hours for the day
   const hours = Array.from({ length: 24 }).map((_, i) => i);
-
-  // Get events for a specific day and hour
-  const getEventsForTimeSlot = (day: Date, hour: number) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
-      return isSameDay(eventDate, day) && getHours(eventDate) === hour;
-    });
-  };
 
   // Calculate event position and dimensions
   const getEventStyle = (event: Event, overlappingEvents: Event[]) => {
