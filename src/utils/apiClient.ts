@@ -1,3 +1,4 @@
+
 import type {
   ApiClient,
   ApiClientConfig,
@@ -110,8 +111,8 @@ class BaseApiClient implements ApiClientInterface {
    */
   private buildUrl(path: string): string {
     // Ensure the path starts with a slash
-    const normalizedPath = path.startsWith('/') ? path : \`/\${path}\`;
-    return \`\${this.baseUrl}\${normalizedPath}\`;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${this.baseUrl}${normalizedPath}`;
   }
 
   /**
@@ -135,7 +136,7 @@ class BaseApiClient implements ApiClientInterface {
       return response;
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error(\`Request timed out after \${timeout}ms\`);
+        throw new Error(`Request timed out after ${timeout}ms`);
       }
       throw error;
     } finally {
@@ -151,13 +152,13 @@ class BaseApiClient implements ApiClientInterface {
       const data = await response.json();
       return {
         status: response.status,
-        message: data.message || data.error || \`HTTP Error \${response.status}\`,
+        message: data.message || data.error || `HTTP Error ${response.status}`,
         details: data,
       };
     } catch (error) {
       return {
         status: response.status,
-        message: response.statusText || \`HTTP Error \${response.status}\`,
+        message: response.statusText || `HTTP Error ${response.status}`,
       };
     }
   }
@@ -371,7 +372,7 @@ class EventsApiClient implements EventsApi {
    * Get a single event by ID
    */
   async getById(id: string, options?: ApiRequestOptions): Promise<ApiResponse<Event>> {
-    return this.api.get<Event>(\`\${this.basePath}/\${id}\`, options);
+    return this.api.get<Event>(`${this.basePath}/${id}`, options);
   }
 
   /**
@@ -392,14 +393,14 @@ class EventsApiClient implements EventsApi {
    * Update an existing event
    */
   async update(event: Event, options?: ApiRequestOptions): Promise<ApiResponse<Event>> {
-    return this.api.put<Event, Event>(\`\${this.basePath}/\${event.id}\`, event, options);
+    return this.api.put<Event, Event>(`${this.basePath}/${event.id}`, event, options);
   }
 
   /**
    * Delete an event by ID
    */
   async delete(id: string, options?: ApiRequestOptions): Promise<ApiResponse<void>> {
-    return this.api.delete<void>(\`\${this.basePath}/\${id}\`, options);
+    return this.api.delete<void>(`${this.basePath}/${id}`, options);
   }
 }
 
@@ -425,7 +426,7 @@ class FamilyMembersApiClient implements FamilyMembersApi {
    * Get a single family member by ID
    */
   async getById(id: string, options?: ApiRequestOptions): Promise<ApiResponse<FamilyMember>> {
-    return this.api.get<FamilyMember>(\`\${this.basePath}/\${id}\`, options);
+    return this.api.get<FamilyMember>(`${this.basePath}/${id}`, options);
   }
 
   /**
@@ -446,14 +447,14 @@ class FamilyMembersApiClient implements FamilyMembersApi {
    * Update an existing family member
    */
   async update(member: FamilyMember, options?: ApiRequestOptions): Promise<ApiResponse<FamilyMember>> {
-    return this.api.put<FamilyMember, FamilyMember>(\`\${this.basePath}/\${member.id}\`, member, options);
+    return this.api.put<FamilyMember, FamilyMember>(`${this.basePath}/${member.id}`, member, options);
   }
 
   /**
    * Delete a family member by ID
    */
   async delete(id: string, options?: ApiRequestOptions): Promise<ApiResponse<void>> {
-    return this.api.delete<void>(\`\${this.basePath}/\${id}\`, options);
+    return this.api.delete<void>(`${this.basePath}/${id}`, options);
   }
 }
 
