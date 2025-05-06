@@ -4,17 +4,40 @@ import { persist } from 'zustand/middleware';
 import { AuthState, AuthActions, UserProfile, UserRole } from '@/types/auth';
 import { toast } from 'sonner';
 
-// This is a placeholder auth store that will be replaced with Supabase Auth
+/**
+ * Authentication Store
+ * 
+ * This is a centralized store for managing authentication state and actions.
+ * It uses Zustand for state management with the persist middleware to enable
+ * persistence of authentication state across page refreshes.
+ * 
+ * Note: This is a placeholder implementation that will be replaced with Supabase Auth.
+ * The mock implementations here demonstrate the expected behavior and interface.
+ */
+
 const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set, get) => ({
-      // Initial state
+      /**
+       * Initial Authentication State
+       */
       user: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
 
-      // Actions
+      /**
+       * User Authentication Actions
+       */
+
+      /**
+       * Login a user with email and password
+       * 
+       * @param email - User's email address
+       * @param password - User's password
+       * @returns Promise that resolves when login is complete
+       * @throws Error if login fails
+       */
       login: async (email: string, password: string) => {
         try {
           set({ isLoading: true, error: null });

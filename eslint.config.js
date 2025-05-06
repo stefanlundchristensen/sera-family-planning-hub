@@ -23,7 +23,24 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "@typescript-eslint/no-unused-vars": "off",
+      // Enforce TypeScript best practices
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        "argsIgnorePattern": "^_", 
+        "varsIgnorePattern": "^_" 
+      }],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/explicit-function-return-type": ["warn", {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true,
+        "allowHigherOrderFunctions": true
+      }],
+      "@typescript-eslint/consistent-type-imports": ["warn", {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": false
+      }],
+      "react-hooks/exhaustive-deps": "error",
+      "prefer-const": "warn",
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
     },
   }
 );
