@@ -44,6 +44,25 @@ interface AuthActions {
 // Combine state and actions
 type AuthStore = AuthState & AuthActions;
 
+// Custom storage implementation that matches PersistStorage interface
+const customStorage = {
+  getItem: (name: string) => {
+    if (typeof window === 'undefined') return null;
+    const str = localStorage.getItem(name);
+    return str ? JSON.parse(str) : null;
+  },
+  setItem: (name: string, value: unknown) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(name, JSON.stringify(value));
+    }
+  },
+  removeItem: (name: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(name);
+    }
+  },
+};
+
 // Create the store
 const useAuthStore = create<AuthStore>()(
   persist(
@@ -146,7 +165,7 @@ const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth-storage', // unique name
-      storage: typeof window !== 'undefined' ? localStorage : undefined, // Use localStorage if available
+      storage: customStorage, // Custom storage implementation
     }
   )
 );

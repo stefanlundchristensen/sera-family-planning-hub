@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import useAuthStore from '@/lib/authStore';
-import type { UserProfile, UserRole } from '@/types/auth';
+import type { UserRole } from '@/types/auth';
 
 export const useAuth = () => {
   const {
@@ -11,9 +11,7 @@ export const useAuth = () => {
     error,
     register,
     login,
-    logout,
-    setUser,
-    setSession
+    logout
   } = useAuthStore();
 
   const handleLogin = useCallback(
