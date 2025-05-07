@@ -31,5 +31,9 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       external: [],
     },
+    // Reduce memory usage to prevent segfaults
+    minify: mode !== 'development',
+    target: 'esnext',
+    chunkSizeWarningLimit: 1000,
   },
 }));

@@ -52,6 +52,11 @@ class MockIntersectionObserver {
 }
 window.IntersectionObserver = MockIntersectionObserver;
 
+// Clear all mocks to prevent memory leaks
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
 // Mock environment variables
 vi.mock('../integrations/supabase/client', () => ({
   supabase: {
