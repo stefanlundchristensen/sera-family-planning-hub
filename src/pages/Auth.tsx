@@ -19,13 +19,20 @@ const Auth = () => {
   const location = useLocation();
   const { session, isLoading: authLoading } = useSupabaseAuth();
   
-  // Check if we have a "from" state to redirect after login
+  // Get the intended destination from location state or default to dashboard
   const from = (location.state as { from?: string })?.from || '/dashboard';
   
-  // Redirect if user is already logged in
+  // Add debug logging to see what's happening
+  useEffect(() => {
+    console.log("Auth page - Session state:", !!session);
+    console.log("Auth page - Auth loading:", authLoading);
+    console.log("Auth page - Redirect destination:", from);
+  }, [session, authLoading, from]);
+
+  // Only redirect if user is authenticated and not in loading state
   useEffect(() => {
     if (session && !authLoading) {
-      console.log("Already authenticated, redirecting");
+      console.log("Already authenticated, redirecting to:", from);
       navigate(from);
     }
   }, [session, authLoading, navigate, from]);

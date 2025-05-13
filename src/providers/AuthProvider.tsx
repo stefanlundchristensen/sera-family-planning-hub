@@ -80,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           navigate('/onboarding');
         }
       } else if (location.pathname === '/auth' || location.pathname === '/onboarding') {
+        // Only redirect from auth or onboarding to dashboard if profile is complete
         console.log("Profile complete, redirecting to dashboard");
         navigate('/dashboard');
       }
