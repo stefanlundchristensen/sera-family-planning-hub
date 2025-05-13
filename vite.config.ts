@@ -16,9 +16,7 @@ export default defineConfig(({ mode }) => ({
     ],
   },
   plugins: [
-    react({
-      plugins: [['@swc/plugin-emotion', {}]],
-    }),
+    react(), // Remove the Emotion plugin configuration
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
