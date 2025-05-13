@@ -8,13 +8,16 @@ A React application designed to help families coordinate schedules, events, and 
 - **Family Profiles**: Create and customize family member profiles
 - **Color-Coded Events**: Easily distinguish events by family member
 - **Dashboard Overview**: See your family's weekly schedule at a glance
+- **Devin Compatible**: This repository is fully compatible with Devin AI for development assistance
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 16+ and npm/yarn
 
 ### Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/sera-family-planning-hub.git
@@ -27,6 +30,7 @@ npm run dev
 ```
 
 ### Build for Production
+
 ```bash
 npm run build
 ```
