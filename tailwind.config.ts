@@ -62,53 +62,7 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-                // SERA brand color palette
-                sera: {
-                  blue: {
-                    DEFAULT: '#2C3E50', // Soft Deep Blue
-                  },
-                  green: {
-                    DEFAULT: '#A3B18A', // Muted Sage Green
-                  },
-                  beige: {
-                    DEFAULT: '#EDE0D4', // Warm Sand Beige
-                  },
-                  skyblue: {
-                    DEFAULT: '#BFD7EA', // Pale Sky Blue
-                  },
-                  slate: {
-                    DEFAULT: '#6C757D', // Deep Slate Gray
-                  }
-                },
-				family: {
-          blue: {
-            light: '#5D9CEC',
-            DEFAULT: '#4A89DC'
-          },
-          teal: {
-            DEFAULT: '#48CFAD'
-          },
-          coral: {
-            DEFAULT: '#FC6E51'
-          },
-          green: {
-            DEFAULT: '#5DB85B'
-          },
-          yellow: {
-            DEFAULT: '#FFCE54'
-          },
-          purple: {
-            DEFAULT: '#AC92EC'
-          },
-          pink: {
-            DEFAULT: '#EC87C0'
-          },
-        }
-			},
-			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				serif: ['Source Serif Pro', 'serif']
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -131,24 +85,13 @@ export default {
 					to: {
 						height: '0'
 					}
-				},
-				'fade-in': {
-					'0%': { 
-						opacity: '0',
-						transform: 'translateY(10px)'
-					},
-					'100%': { 
-						opacity: '1',
-						transform: 'translateY(0)'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [import("tailwindcss-animate")],
 } satisfies Config;
