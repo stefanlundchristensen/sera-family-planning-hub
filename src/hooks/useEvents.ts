@@ -10,7 +10,7 @@ interface UseEventsReturn {
   updateEvent: (updatedEvent: Event) => void;
   deleteEvent: (eventId: string) => void;
   getEventById: (eventId: string) => Event | undefined;
-  getEventColor: (assignedTo: string) => string;
+  getEventColor: (assignedTo: string, title: string) => string; // Updated to match the signature in colorUtils.ts
 }
 
 export function useEvents(): UseEventsReturn {
