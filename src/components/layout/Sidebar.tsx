@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { CalendarDays, Users, Settings, Menu, X, LayoutDashboard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -11,11 +11,11 @@ interface SidebarProps {
   className?: string;
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className }: SidebarProps): JSX.Element {
   const [collapsed, setCollapsed] = useState(false);
   const { signOut } = useSupabaseAuth();
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     try {
       await signOut();
       toast.success("Successfully logged out");
@@ -76,7 +76,7 @@ interface SidebarItemProps {
   collapsed: boolean;
 }
 
-function SidebarItem({ children, icon, collapsed }: SidebarItemProps) {
+function SidebarItem({ children, icon, collapsed }: SidebarItemProps): JSX.Element {
   // Determine href based on menu item
   let href = "#";
   if (children === "Dashboard") href = "/dashboard";

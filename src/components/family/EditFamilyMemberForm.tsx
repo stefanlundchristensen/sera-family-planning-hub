@@ -6,27 +6,29 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
+interface FamilyMember {
+  id: number;
+  name: string;
+  role: string;
+  color: string;
+}
+
 interface EditFamilyMemberFormProps {
-  member: {
-    id: number;
-    name: string;
-    role: string;
-    color: string;
-  };
-  onSave: (member: any) => void;
+  member: FamilyMember;
+  onSave: (member: FamilyMember) => void;
   onCancel: () => void;
   isLoading?: boolean;
   error?: string | null;
 }
 
-export function EditFamilyMemberForm({ member, onSave, onCancel, isLoading = false, error }: EditFamilyMemberFormProps) {
-  const [editedMember, setEditedMember] = useState({ ...member });
+export function EditFamilyMemberForm({ member, onSave, onCancel, isLoading = false, error }: EditFamilyMemberFormProps): JSX.Element {
+  const [editedMember, setEditedMember] = useState<FamilyMember>({ ...member });
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: unknown): void => {
     setEditedMember({ ...editedMember, [field]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     onSave(editedMember);
   };
@@ -96,7 +98,7 @@ export function EditFamilyMemberForm({ member, onSave, onCancel, isLoading = fal
 }
 
 // Helper function to get color values
-function getColorValue(color: string) {
+function getColorValue(color: string): string {
   const colorMap: Record<string, string> = {
     blue: "#4A89DC",
     teal: "#48CFAD",

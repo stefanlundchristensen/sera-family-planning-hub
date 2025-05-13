@@ -6,26 +6,34 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
+interface MemberData {
+  name: string;
+  role: string;
+  color: string;
+  linkedCalendar: boolean;
+  id?: number;
+}
+
 interface AddFamilyMemberFormProps {
-  onSave: (member: any) => void;
+  onSave: (member: MemberData) => void;
   onCancel: () => void;
   isLoading?: boolean;
   error?: string | null;
 }
 
-export function AddFamilyMemberForm({ onSave, onCancel, isLoading = false, error }: AddFamilyMemberFormProps) {
-  const [member, setMember] = useState({
+export function AddFamilyMemberForm({ onSave, onCancel, isLoading = false, error }: AddFamilyMemberFormProps): JSX.Element {
+  const [member, setMember] = useState<MemberData>({
     name: "",
     role: "",
     color: "blue",
     linkedCalendar: false
   });
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: unknown): void => {
     setMember({ ...member, [field]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     onSave({
       ...member,
@@ -98,7 +106,7 @@ export function AddFamilyMemberForm({ onSave, onCancel, isLoading = false, error
 }
 
 // Helper function to get color values
-function getColorValue(color: string) {
+function getColorValue(color: string): string {
   const colorMap: Record<string, string> = {
     blue: "#4A89DC",
     teal: "#48CFAD",

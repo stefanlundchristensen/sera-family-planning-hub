@@ -1,13 +1,22 @@
 
 import { useState } from "react";
-import { Event } from "../types/events";
+import type { Event } from "../types/events";
 import { getEventColor } from "../utils/colorUtils";
 import { createWeeklyEvents } from "../utils/eventCreation";
 
-export function useEvents() {
+interface UseEventsReturn {
+  events: Event[];
+  addEvent: (event: Omit<Event, "id">) => Event;
+  updateEvent: (updatedEvent: Event) => void;
+  deleteEvent: (eventId: string) => void;
+  getEventById: (eventId: string) => Event | undefined;
+  getEventColor: (assignedTo: string) => string;
+}
+
+export function useEvents(): UseEventsReturn {
   const [events, setEvents] = useState<Event[]>(createWeeklyEvents());
 
-  const addEvent = (event: Omit<Event, "id">) => {
+  const addEvent = (event: Omit<Event, "id">): Event => {
     const newEvent = {
       ...event,
       id: String(Date.now()),
@@ -16,17 +25,17 @@ export function useEvents() {
     return newEvent;
   };
 
-  const updateEvent = (updatedEvent: Event) => {
+  const updateEvent = (updatedEvent: Event): void => {
     setEvents(events.map(event => 
       event.id === updatedEvent.id ? updatedEvent : event
     ));
   };
 
-  const deleteEvent = (eventId: string) => {
+  const deleteEvent = (eventId: string): void => {
     setEvents(events.filter(event => event.id !== eventId));
   };
 
-  const getEventById = (eventId: string) => {
+  const getEventById = (eventId: string): Event | undefined => {
     return events.find(event => event.id === eventId);
   };
 

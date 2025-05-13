@@ -10,7 +10,7 @@ interface FamilyMemberProps {
   className?: string;
 }
 
-export function FamilyMember({ name, role, color, avatar, className }: FamilyMemberProps) {
+export function FamilyMember({ name, role, color, avatar, className }: FamilyMemberProps): JSX.Element {
   return (
     <div className={cn("flex items-center p-4 bg-white rounded-lg border", className)}>
       <div 

@@ -14,10 +14,10 @@ interface DateInputPickerProps {
   disabled?: (date: Date) => boolean;
 }
 
-export function DateInputPicker({ date, onDateChange, disabled }: DateInputPickerProps) {
+export function DateInputPicker({ date, onDateChange, disabled }: DateInputPickerProps): JSX.Element {
   const [inputValue, setInputValue] = useState(date ? format(date, 'MM/dd/yyyy') : '');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value;
     setInputValue(value);
 
@@ -52,7 +52,7 @@ export function DateInputPicker({ date, onDateChange, disabled }: DateInputPicke
           <Calendar
             mode="single"
             selected={date}
-            onSelect={(newDate) => {
+            onSelect={(newDate): void => {
               onDateChange(newDate);
               if (newDate) {
                 setInputValue(format(newDate, 'MM/dd/yyyy'));

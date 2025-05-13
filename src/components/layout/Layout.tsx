@@ -1,12 +1,12 @@
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children }: LayoutProps): JSX.Element {
   return (
     <div className="flex h-screen">
       <Sidebar />

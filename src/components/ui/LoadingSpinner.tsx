@@ -1,7 +1,7 @@
 
 import { Loader } from "lucide-react";
 
-export function LoadingSpinner({ className = "" }: { className?: string }) {
+export function LoadingSpinner({ className = "" }: { className?: string }): JSX.Element {
   return (
     <div className={`flex justify-center items-center ${className}`}>
       <Loader className="animate-spin text-primary" size={28} />

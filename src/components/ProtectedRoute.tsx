@@ -2,8 +2,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSupabaseAuth } from '@/providers/AuthProvider';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import type { ReactNode } from 'react';
 
-export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+export const ProtectedRoute = ({ children }: { children: ReactNode }): JSX.Element => {
   const { session, isLoading } = useSupabaseAuth();
   const location = useLocation();
 
