@@ -54,6 +54,12 @@ src/
 └── types/          # TypeScript type definitions
 ```
 
+## Architecture
+
+For a detailed view of the application architecture, see the [Architecture Documentation](./docs/architecture/README.md).
+
+![SERA Family Planning Hub Architecture](./docs/architecture/SERA%20Family%20Planning%20Hub%20Architecture.png)
+
 ## Contributing
 
 1. Fork the repository
