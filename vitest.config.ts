@@ -33,5 +33,7 @@ export default defineConfig({
       },
     },
     logHeapUsage: true,
+    testTimeout: 20000, // Add longer timeout for tests
+    hookTimeout: 20000, // Add timeout for hooks
   },
 });

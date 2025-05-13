@@ -25,11 +25,26 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
     exclude: ['@vitejs/plugin-react-swc'],
+    esbuildOptions: {
+      // Reduce memory usage during dependency optimization
+      target: 'esnext',
+      supported: { 
+        'top-level-await': true 
+      },
+    }
   },
   build: {
     sourcemap: mode === 'development',
     rollupOptions: {
       external: [],
+      output: {
+        // Split chunks more aggressively to reduce memory pressure
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          }
+        }
+      },
     },
     // Reduce memory usage to prevent segfaults
     minify: mode !== 'development',
