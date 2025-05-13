@@ -1,9 +1,11 @@
 
 import { ReactNode } from "react";
-import { CalendarDays, Users, Settings, Menu, X, LayoutDashboard } from "lucide-react";
+import { CalendarDays, Users, Settings, Menu, X, LayoutDashboard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useSupabaseAuth } from "@/providers/AuthProvider";
+import { toast } from "sonner";
 
 interface SidebarProps {
   className?: string;
@@ -11,6 +13,17 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const { signOut } = useSupabaseAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Successfully logged out");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to log out");
+    }
+  };
 
   return (
     <div className={cn(
@@ -36,6 +49,23 @@ export function Sidebar({ className }: SidebarProps) {
         <SidebarItem icon={<Users />} collapsed={collapsed}>Family</SidebarItem>
         <SidebarItem icon={<Settings />} collapsed={collapsed}>Settings</SidebarItem>
       </nav>
+      
+      {/* Logout Button at bottom */}
+      <div className={cn(
+        "mt-auto border-t border-sidebar-border p-4",
+        collapsed ? "flex justify-center" : ""
+      )}>
+        <button 
+          onClick={handleLogout}
+          className={cn(
+            "flex items-center text-sidebar-foreground hover:bg-sidebar-accent rounded-md transition-colors w-full",
+            collapsed ? "justify-center p-3" : "p-3"
+          )}
+        >
+          <span className="flex-shrink-0 text-red-500"><LogOut size={20} /></span>
+          {!collapsed && <span className="ml-3">Logout</span>}
+        </button>
+      </div>
     </div>
   );
 }
