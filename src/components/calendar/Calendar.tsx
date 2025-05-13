@@ -6,41 +6,29 @@ import { DayView } from "./DayView";
 import { MonthView } from "./MonthView";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EventForm } from "../events/EventForm";
-import { useEvents } from "@/hooks/useEvents";
+import { useCalendarEvents } from "@/hooks/useCalendarEvents";
+import type { CalendarView } from "@/types/calendar";
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState<"day" | "week" | "month">("week");
-  const [isNewEventOpen, setIsNewEventOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [view, setView] = useState<CalendarView>("week");
   
-  const { events, addEvent, updateEvent } = useEvents();
-
-  const handleEventClick = (event: any) => {
-    setSelectedEvent(event);
-    setIsNewEventOpen(true);
-  };
-
-  const handleNewEvent = () => {
-    setSelectedEvent(null);
-    setIsNewEventOpen(true);
-  };
-
-  const handleSaveEvent = (event: any) => {
-    if (event.id) {
-      updateEvent(event);
-    } else {
-      addEvent(event);
-    }
-    setIsNewEventOpen(false);
-  };
+  const {
+    events,
+    isNewEventOpen,
+    selectedEvent,
+    openNewEventForm,
+    openEventEditForm,
+    closeEventForm,
+    handleSaveEvent
+  } = useCalendarEvents();
 
   return (
     <div className="flex flex-col h-full">
       <CalendarHeader 
         currentDate={currentDate} 
         onDateChange={setCurrentDate} 
-        onNewEvent={handleNewEvent}
+        onNewEvent={openNewEventForm}
         view={view}
         onChangeView={setView}
       />
@@ -49,7 +37,7 @@ export function Calendar() {
         <DayView 
           currentDate={currentDate} 
           events={events} 
-          onEventClick={handleEventClick} 
+          onEventClick={openEventEditForm} 
         />
       )}
       
@@ -57,7 +45,7 @@ export function Calendar() {
         <WeekView 
           currentDate={currentDate} 
           events={events} 
-          onEventClick={handleEventClick} 
+          onEventClick={openEventEditForm} 
         />
       )}
       
@@ -65,11 +53,11 @@ export function Calendar() {
         <MonthView 
           currentDate={currentDate} 
           events={events} 
-          onEventClick={handleEventClick} 
+          onEventClick={openEventEditForm} 
         />
       )}
       
-      <Dialog open={isNewEventOpen} onOpenChange={setIsNewEventOpen}>
+      <Dialog open={isNewEventOpen} onOpenChange={closeEventForm}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{selectedEvent ? "Edit Event" : "New Event"}</DialogTitle>
@@ -82,7 +70,7 @@ export function Calendar() {
               assignedTo: "",
             }}
             onSave={handleSaveEvent}
-            onCancel={() => setIsNewEventOpen(false)}
+            onCancel={closeEventForm}
           />
         </DialogContent>
       </Dialog>

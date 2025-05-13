@@ -1,16 +1,10 @@
 
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { Event } from "@/types/events";
-import { getEventColor } from "@/utils/colorUtils";
+import { getEventStyles } from "@/utils/colorUtils";
+import type { CalendarViewProps } from "@/types/calendar";
 
-interface MonthViewProps {
-  currentDate: Date;
-  events: Event[];
-  onEventClick: (event: Event) => void;
-}
-
-export function MonthView({ currentDate, events, onEventClick }: MonthViewProps) {
+export function MonthView({ currentDate, events, onEventClick }: CalendarViewProps) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -45,29 +39,25 @@ export function MonthView({ currentDate, events, onEventClick }: MonthViewProps)
               {format(day, 'd')}
             </div>
             <div className="space-y-1">
-              {getEventsForDay(day).map((event) => (
-                <button
-                  key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className={cn(
-                    "w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis",
-                    event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                      ? "text-gray-600 border border-gray-200 bg-gray-50"
-                      : "text-white"
-                  )}
-                  style={{
-                    backgroundColor: getEventColor(event.assignedTo, event.title)
-                  }}
-                >
-                  <span className={
-                    event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                      ? "text-gray-600"
-                      : "text-white"
-                  }>
-                    {format(event.start, 'HH:mm')} {event.title}
-                  </span>
-                </button>
-              ))}
+              {getEventsForDay(day).map((event) => {
+                const styles = getEventStyles(event.assignedTo, event.title);
+                
+                return (
+                  <button
+                    key={event.id}
+                    onClick={() => onEventClick(event)}
+                    className="w-full text-left text-xs p-1 rounded overflow-hidden whitespace-nowrap overflow-ellipsis"
+                    style={{
+                      backgroundColor: styles.backgroundColor,
+                      color: styles.textColor
+                    }}
+                  >
+                    <span>
+                      {format(event.start, 'HH:mm')} {event.title}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}

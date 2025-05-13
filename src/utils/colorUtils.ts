@@ -1,187 +1,92 @@
-
 /**
- * Color utility functions for the SERA Family Planning Hub
- * These functions help maintain consistent color usage across the application
+ * Mapping of family member names to their assigned colors.
+ * This will be replaced with a proper database-backed system in the future.
  */
-
-/**
- * Core color palette based on SERA brand identity
- */
-export const COLORS = {
-  // Primary palette
-  primary: {
-    light: '#BFD7EA', // Pale Sky Blue
-    main: '#6C9EBF',  // Medium Blue
-    dark: '#2C3E50',  // Soft Deep Blue
-  },
-  // Secondary palette
-  secondary: {
-    light: '#E0E8D5', // Light Sage
-    main: '#A3B18A',  // Muted Sage Green
-    dark: '#588157',  // Deep Sage
-  },
-  // Neutral palette
-  neutral: {
-    white: '#FFFFFF',
-    lightest: '#F8F9FA',
-    light: '#F6F6F7',
-    medium: '#DEE2E6',
-    gray: '#6C757D',   // Deep Slate Gray
-    dark: '#343A40',
-    darkest: '#212529',
-    black: '#000000',
-  },
-  // Accent colors
-  accent: {
-    beige: '#EDE0D4',  // Warm Sand Beige
-    purple: '#E5DEFF', // Soft Purple
-    coral: '#FFA69E',  // Soft Coral
-    yellow: '#FFD670', // Muted Yellow
-    teal: '#7DCFB6',   // Soft Teal
-    pink: '#F78CAF',   // Soft Pink
-  },
-  // Semantic colors
-  semantic: {
-    success: '#43AA8B',
-    warning: '#F9C74F',
-    error: '#E63946',
-    info: '#4EA8DE',
-  }
+const memberColorMap: Record<string, string> = {
+  "Mom": "#20B2AA",
+  "Dad": "#4169E1",
+  "Tommy": "#FF7F50",
+  "Emma": "#9370DB",
+  "Everyone": "#3CB371"
 };
 
 /**
- * Define standard event category colors
+ * Color mapping for event categories.
+ * This will be expanded as event categorization is improved.
  */
-export const EVENT_CATEGORIES = {
-  work: COLORS.accent.purple,
-  school: COLORS.accent.teal,
-  medical: COLORS.semantic.info,
-  social: COLORS.accent.coral,
-  sports: COLORS.accent.yellow,
-  holiday: COLORS.secondary.main,
-  other: COLORS.neutral.gray,
+const categoryColorMap: Record<string, string> = {
+  "work": "#F0F0F0",
+  "school": "#FFD700",
+  "family": "#9ACD32",
+  "health": "#FF6347"
 };
 
 /**
- * Define color mapping for family members using SERA brand colors
+ * Default color to use when no matching color is found.
  */
-export const FAMILY_MEMBER_COLORS: Record<string, string> = {
-  "Mom": COLORS.secondary.main,      // Muted Sage Green
-  "Dad": COLORS.primary.dark,        // Soft Deep Blue
-  "Sarah": COLORS.primary.light,     // Pale Sky Blue
-  "Michael Jr": COLORS.neutral.gray, // Deep Slate Gray
-  "Everyone": COLORS.neutral.gray,   // Deep Slate Gray
-  "Grandma Linda": COLORS.accent.beige, // Warm Sand Beige
-  "Grandpa Joe": COLORS.secondary.main, // Muted Sage Green variant
-};
+const DEFAULT_COLOR = "#808080";
 
 /**
- * Standard color options for new family members
- */
-export const COLOR_OPTIONS = [
-  { name: 'Blue', value: COLORS.primary.main },
-  { name: 'Teal', value: COLORS.accent.teal },
-  { name: 'Purple', value: COLORS.accent.purple },
-  { name: 'Coral', value: COLORS.accent.coral },
-  { name: 'Green', value: COLORS.secondary.main },
-  { name: 'Yellow', value: COLORS.accent.yellow },
-  { name: 'Pink', value: COLORS.accent.pink },
-];
-
-/**
- * Get the appropriate color for an event based on who it's assigned to and the event title
+ * Returns the color associated with a family member.
+ * If no color is found, returns the default color.
  * 
- * @param assignedTo - The person the event is assigned to
- * @param title - The event title
- * @returns A color hex code
+ * @param memberId - The name or ID of the family member
+ * @param title - Optional event title to check for category keywords
+ * @returns A CSS color string
  */
-export function getEventColor(assignedTo: string, title: string): string {
-  const lowerTitle = title.toLowerCase();
-  
-  // Check for category-based colors
-  if (lowerTitle.includes('work') || lowerTitle.includes('office')) {
-    if (assignedTo === 'Mom') {
-      return '#E5DEFF'; // Custom color for Mom's work
-    }
-    if (assignedTo === 'Dad') {
-      return '#D3E4FD'; // Custom color for Dad's work
-    }
-    return EVENT_CATEGORIES.work;
+export function getEventColor(memberId: string, title?: string): string {
+  // If title is provided and contains a work-related keyword, use category color
+  if (title && (title.toLowerCase().includes('work') || title.toLowerCase().includes('office'))) {
+    return categoryColorMap["work"] || DEFAULT_COLOR;
   }
   
-  if (lowerTitle.includes('school') || lowerTitle.includes('class') || lowerTitle.includes('homework')) {
-    return EVENT_CATEGORIES.school;
-  }
-  
-  if (lowerTitle.includes('doctor') || lowerTitle.includes('medical') || lowerTitle.includes('appointment')) {
-    return EVENT_CATEGORIES.medical;
-  }
-  
-  if (lowerTitle.includes('party') || lowerTitle.includes('dinner') || lowerTitle.includes('lunch')) {
-    return EVENT_CATEGORIES.social;
-  }
-  
-  if (lowerTitle.includes('game') || lowerTitle.includes('practice') || lowerTitle.includes('sport')) {
-    return EVENT_CATEGORIES.sports;
-  }
-  
-  if (lowerTitle.includes('holiday') || lowerTitle.includes('vacation')) {
-    return EVENT_CATEGORIES.holiday;
-  }
-  
-  // Default to family member's color
-  return FAMILY_MEMBER_COLORS[assignedTo] || COLORS.neutral.gray;
+  // Otherwise use member color
+  return memberColorMap[memberId] || DEFAULT_COLOR;
 }
 
 /**
- * Determine if a color is dark (to decide if text should be white or black)
+ * Returns the background version of a color for event backgrounds.
+ * For work events, returns gray background with normal text.
+ * For other events, returns the color with opacity.
  * 
- * @param hexColor - The hex color code
- * @returns True if the color is dark, false if it's light
+ * @param memberId - The name or ID of the family member
+ * @param title - Optional event title to check for category keywords
+ * @returns An object with backgroundColor and textColor
  */
-export function isDarkColor(hexColor: string): boolean {
-  // Remove the hash if it exists
-  const hex = hexColor.replace('#', '');
+export function getEventStyles(memberId: string, title?: string): { backgroundColor: string; textColor: string } {
+  const color = getEventColor(memberId, title);
   
-  // Parse the RGB values
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
+  // Work events have different styling
+  if (title && (title.toLowerCase().includes('work') || title.toLowerCase().includes('office'))) {
+    return {
+      backgroundColor: color,
+      textColor: '#333333'
+    };
+  }
   
-  // Calculate the brightness using the YIQ formula
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  
-  // Darker colors have lower brightness
-  return brightness < 128;
+  // Regular events get opacity in background and white text
+  return {
+    backgroundColor: `${color}`,
+    textColor: '#FFFFFF'
+  };
 }
 
 /**
- * Get the appropriate text color (black or white) for a given background color
+ * Gets color value from a named color.
+ * Used for family member color selection.
  * 
- * @param backgroundColor - The background color hex code
- * @returns Black or white color code for optimal contrast
+ * @param color - Named color
+ * @returns The hexadecimal color value
  */
-export function getTextColorForBackground(backgroundColor: string): string {
-  return isDarkColor(backgroundColor) ? '#FFFFFF' : '#000000';
+export function getColorValue(color: string): string {
+  const colorMap: Record<string, string> = {
+    blue: '#4A89DC',
+    teal: '#48CFAD',
+    coral: '#FC6E51',
+    purple: '#AC92EC',
+    green: '#5DB85B',
+    yellow: '#FFCE54',
+    pink: '#EC87C0',
+  };
+  return colorMap[color] || colorMap.blue;
 }
-
-/**
- * Generate a color with adjusted opacity
- * 
- * @param hexColor - The base hex color
- * @param opacity - The opacity value (0-1)
- * @returns RGBA color string
- */
-export function colorWithOpacity(hexColor: string, opacity: number): string {
-  // Remove the hash if it exists
-  const hex = hexColor.replace('#', '');
-  
-  // Parse the RGB values
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-  
-  // Return RGBA color
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-}
-

@@ -1,15 +1,18 @@
+
 import { useState } from "react";
 import { format, startOfWeek, addDays, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useEvents } from "@/hooks/useEvents";
+import { useCalendarEvents } from "@/hooks/useCalendarEvents";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getEventColor } from "@/utils/colorUtils";
+import { getEventStyles } from "@/utils/colorUtils";
 
 export function WeeklyOverview() {
   const [currentDate] = useState(new Date());
-  const { events, deleteEvent } = useEvents();
+  const { events } = useEvents();
+  const { openNewEventForm, openEventEditForm, handleDeleteEvent } = useCalendarEvents();
   const { toast } = useToast();
   
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -21,8 +24,8 @@ export function WeeklyOverview() {
     );
   };
 
-  const handleDeleteEvent = (eventId: string) => {
-    deleteEvent(eventId);
+  const handleDelete = (eventId: string) => {
+    handleDeleteEvent(eventId);
     toast({
       description: "Event deleted successfully",
     });
@@ -39,48 +42,57 @@ export function WeeklyOverview() {
             )}>
               {format(day, 'EEEE')} <span className="text-muted-foreground font-normal">({format(day, 'MMM d')})</span>
             </h2>
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={openNewEventForm}
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
           
           {getEventsForDay(day).length > 0 ? (
             <ul className="space-y-2">
-              {getEventsForDay(day).map((event) => (
-                <li 
-                  key={event.id} 
-                  className={cn(
-                    "flex items-center justify-between group rounded-lg p-2 hover:bg-accent transition-colors"
-                  )}
-                  style={{
-                    backgroundColor: event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                      ? `${getEventColor(event.assignedTo, event.title)}` 
-                      : `${getEventColor(event.assignedTo, event.title)}20`
-                  }}
-                >
-                  <div>
-                    <span className="font-medium">{format(event.start, 'HH:mm')}:</span>{' '}
-                    {event.title}{' '}
-                    <span className="text-muted-foreground">({event.assignedTo})</span>
-                    {event.location && (
-                      <div className="text-sm text-muted-foreground">📍 {event.location}</div>
-                    )}
-                  </div>
-                  <div className="space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-destructive" 
-                      onClick={() => handleDeleteEvent(event.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </li>
-              ))}
+              {getEventsForDay(day).map((event) => {
+                const styles = getEventStyles(event.assignedTo, event.title);
+                
+                return (
+                  <li 
+                    key={event.id} 
+                    className="flex items-center justify-between group rounded-lg p-2 hover:bg-accent transition-colors"
+                    style={{
+                      backgroundColor: `${styles.backgroundColor}20` // Low opacity version
+                    }}
+                  >
+                    <div>
+                      <span className="font-medium">{format(event.start, 'HH:mm')}:</span>{' '}
+                      {event.title}{' '}
+                      <span className="text-muted-foreground">({event.assignedTo})</span>
+                      {event.location && (
+                        <div className="text-sm text-muted-foreground">📍 {event.location}</div>
+                      )}
+                    </div>
+                    <div className="space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => openEventEditForm(event)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-destructive" 
+                        onClick={() => handleDelete(event.id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           ) : (
             <p className="text-sm text-muted-foreground pl-4">No events scheduled</p>

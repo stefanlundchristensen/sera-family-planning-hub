@@ -1,15 +1,10 @@
 
 import { format, isSameDay, getHours, getMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { Event } from "@/types/events";
+import { getEventStyles } from "@/utils/colorUtils";
+import type { CalendarViewProps } from "@/types/calendar";
 
-interface DayViewProps {
-  currentDate: Date;
-  events: Event[];
-  onEventClick: (event: Event) => void;
-}
-
-export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
+export function DayView({ currentDate, events, onEventClick }: CalendarViewProps) {
   const hours = Array.from({ length: 24 }).map((_, i) => i);
 
   const getEventsForHour = (hour: number) => {
@@ -21,6 +16,16 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
 
   const formatTimeLabel = (hour: number) => {
     return format(new Date().setHours(hour, 0, 0, 0), 'h a');
+  };
+
+  const getEventHeight = (event: { start: Date, end: Date }): number => {
+    const startHour = getHours(event.start);
+    const startMinute = getMinutes(event.start);
+    const endHour = getHours(event.end);
+    const endMinute = getMinutes(event.end);
+    
+    const totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
+    return Math.max(totalMinutes / 60 * 80, 20);
   };
 
   return (
@@ -43,41 +48,38 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
                 {formatTimeLabel(hour)}
               </div>
               <div className="relative">
-                {getEventsForHour(hour).map((event) => (
-                  <div
-                    key={event.id}
-                    onClick={() => onEventClick(event)}
-                    className={cn(
-                      "absolute top-0 left-0 right-2 m-1 p-2 rounded text-sm cursor-pointer",
-                      event.recurring ? "border-l-4" : "",
-                      "bg-opacity-90 hover:bg-opacity-100 transition-opacity",
-                      event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                        ? "text-gray-600 border border-gray-200"
-                        : "text-white"
-                    )}
-                    style={{
-                      height: `${getEventHeight(event)}px`,
-                      backgroundColor: getEventColor(event.assignedTo)
-                    }}
-                  >
-                    <div className={cn(
-                      "font-semibold",
-                      event.title.toLowerCase().includes('work') || event.title.toLowerCase().includes('office')
-                        ? "text-gray-600"
-                        : "text-white"
-                    )}>
-                      {event.title}
-                    </div>
-                    <div className="text-white text-xs">
-                      {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
-                    </div>
-                    {event.location && (
-                      <div className="text-white text-xs mt-1">
-                        📍 {event.location}
+                {getEventsForHour(hour).map((event) => {
+                  const styles = getEventStyles(event.assignedTo, event.title);
+                  
+                  return (
+                    <div
+                      key={event.id}
+                      onClick={() => onEventClick(event)}
+                      className={cn(
+                        "absolute top-0 left-0 right-2 m-1 p-2 rounded text-sm cursor-pointer",
+                        event.recurring ? "border-l-4" : "",
+                        "bg-opacity-90 hover:bg-opacity-100 transition-opacity"
+                      )}
+                      style={{
+                        height: `${getEventHeight(event)}px`,
+                        backgroundColor: styles.backgroundColor,
+                        color: styles.textColor
+                      }}
+                    >
+                      <div className="font-semibold">
+                        {event.title}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <div className="text-xs">
+                        {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                      </div>
+                      {event.location && (
+                        <div className="text-xs mt-1">
+                          📍 {event.location}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -85,25 +87,4 @@ export function DayView({ currentDate, events, onEventClick }: DayViewProps) {
       </div>
     </div>
   );
-}
-
-function getEventHeight(event: Event): number {
-  const startHour = getHours(event.start);
-  const startMinute = getMinutes(event.start);
-  const endHour = getHours(event.end);
-  const endMinute = getMinutes(event.end);
-  
-  const totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
-  return Math.max(totalMinutes / 60 * 80, 20);
-}
-
-function getEventColor(member: string): string {
-  const colors: { [key: string]: string } = {
-    "Mom": "#20B2AA",
-    "Dad": "#4169E1",
-    "Tommy": "#FF7F50",
-    "Emma": "#9370DB",
-    "Everyone": "#3CB371"
-  };
-  return colors[member] || "#808080";
 }
