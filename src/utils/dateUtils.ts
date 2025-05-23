@@ -1,15 +1,14 @@
-
-import { 
-  format, 
+import {
+  format,
   parse,
-  startOfWeek, 
-  endOfWeek, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
-  isSameDay, 
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameDay,
   isSameMonth,
-  differenceInMinutes
+  differenceInMinutes,
 } from 'date-fns';
 
 /**
@@ -46,7 +45,7 @@ export function getWeekEnd(date: Date): Date {
 export function getWeekDays(date: Date): Date[] {
   const start = getWeekStart(date);
   const end = getWeekEnd(date);
-  
+
   return eachDayOfInterval({ start, end });
 }
 
@@ -73,7 +72,7 @@ export function getMonthDays(date: Date): Date[] {
   const monthEnd = getMonthEnd(date);
   const calendarStart = getWeekStart(monthStart);
   const calendarEnd = getWeekEnd(monthEnd);
-  
+
   return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 }
 
@@ -96,7 +95,7 @@ export function isSameMonthDate(date1: Date, date2: Date): boolean {
  */
 export function formatDateRange(start: Date, end: Date): string {
   if (isSameDay(start, end)) {
-    return `${format(start, 'MMM d, yyyy')} ${format(start, 'h:mm a')} - ${format(end, 'h:mm a')}`;
+    return `${format(start, 'MMM d, yyyy')} ${formatTimeHour(start)} - ${formatTimeHour(end)}`;
   } else {
     return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
   }
@@ -107,4 +106,25 @@ export function formatDateRange(start: Date, end: Date): string {
  */
 export function getDurationMinutes(start: Date, end: Date): number {
   return differenceInMinutes(end, start);
+}
+
+/**
+ * Format time in 24-hour format
+ */
+export function formatTimeHour(date: Date): string {
+  return format(date, 'HH:mm');
+}
+
+/**
+ * Format day name in abbreviated format
+ */
+export function formatDayAbbrev(date: Date): string {
+  return format(date, 'EEE');
+}
+
+/**
+ * Format day number
+ */
+export function formatDayNumber(date: Date): string {
+  return format(date, 'd');
 }
