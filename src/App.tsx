@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import WeeklyPlanning from "./pages/WeeklyPlanning";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +39,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/weekly-planning"
+              element={
+                <ProtectedRoute>
+                  <WeeklyPlanning />
                 </ProtectedRoute>
               }
             />

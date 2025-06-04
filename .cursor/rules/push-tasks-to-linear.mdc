@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Rule: Push Tasks to Linear as Issues
+
+## Goal
+
+Guide an AI assistant to take a generated task list in Markdown format and create corresponding issues in Linear. The process should be explicit, step-by-step, and ensure all necessary information is gathered and confirmed before proceeding.
+
+## Process
+
+1. **Receive Task List Input:** The user provides the path to a task list file (e.g., `/tasks/tasks-prd-user-profile-editing.md`).
+2. **Analyze Task List:** The AI reads and parses the parent tasks and sub-tasks from the Markdown file.
+3. **Deduce Target Project:** The AI makes a best effort to deduce which Linear project these tasks should be added to, based on the task list filename, PRD references, or recent project context. The AI *must* confirm the target project with the user before proceeding.
+4. **Ask Clarifying Questions:** Before creating issues, the AI *must* ask clarifying questions to gather all required details (see below).
+5. **Create Issues in Linear:** For each parent task (and optionally sub-tasks), create a corresponding issue in the confirmed Linear project. Use the task descriptions as issue titles and details. Link sub-tasks as subtasks or checklist items if supported by Linear.
+6. **Confirm and Summarize:** After creating the issues, confirm with the user and provide a summary or links to the created issues in Linear.
+
+## Clarifying Questions (Examples)
+
+The AI should adapt its questions based on the task list and user input, but here are some common areas to clarify:
+
+* **Target Project:** "Which Linear project should these tasks be added to? (Best guess: [project name])"
+* **Team:** "Should these issues be linked to a specific team? (Optional)"
+* **Assignees:** "Who should be assigned to these issues? (Optional, can be left unassigned)"
+* **Labels:** "Should any specific labels be added to these issues? (Optional)"
+* **Issue Structure:** "Should sub-tasks be created as separate issues, as checklist items, or as part of the parent issue description? (Default: checklist items)"
+* **Priority:** "Should any tasks be marked as high priority? (Optional)"
+
+## Issue Creation Structure
+
+When creating issues in Linear you should have parent tasks as issues, use the following mapping from the task list:
+
+1. **Issue Title:** Use the parent task title and keep the numbering of tasks
+2. **Description:** Use the sub-task details, relevant notes, or context from the task list.
+3. **Project:** Link to the confirmed Linear project.
+4. **Team:** Link to the specified team if provided.
+5. **Assignee:** Assign as specified.
+6. **Labels:** Add any specified labels.
+7. **Checklist:** If sub-tasks are not created as separate issues, include them as checklist items in the parent issue.
+8. **Priority:** Set as specified.
+9. **Sub-issues** Use any sub-tasks that are there
+
+## Output
+
+* **Action:** Create new issues in Linear using the provided details and task list content.
+* **Confirmation:** Output a summary of the created issues and links to them in Linear.
+
+## Final Instructions
+
+1. Do NOT start creating Linear issues until all clarifying questions are answered and the target project is confirmed.
+2. Be explicit and unambiguous in the steps and required information.
+3. If any required information is missing, ask the user before proceeding.
+4. After issue creation, confirm with the user and provide a summary/links.
