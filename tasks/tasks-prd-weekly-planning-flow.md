@@ -20,7 +20,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Create entry point and dedicated page for the weekly planning flow
+- [x] 1.0 Create entry point and dedicated page for the weekly planning flow
   - [x] 1.1 Add a "Weekly Planning" item to the sidebar in `Sidebar.tsx` with a suitable icon and link to `/weekly-planning`.
   - [x] 1.2 Create `src/pages/WeeklyPlanning.tsx` as a new page component.
   - [x] 1.3 Set up routing so `/weekly-planning` loads the new page.

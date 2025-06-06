@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Rule: Sync Linear and Local Tasks
+
+## Goal
+
+Guide an AI assistant to ensure that Product Requirements Documents (PRDs), task lists, and their corresponding Linear projects and issues are always in sync. Discrepepncies should be raised with a recommendation for how to resolve it
+
+## Process
+
+1. **Receive Input:** The user provides the path to a PRD file (e.g., `/tasks/prd-[feature-name].md`) and/or a task list file (e.g., `/tasks/tasks-prd-[feature-name].md`).
+2. **Clarifying Questions:** Before any sync, the AI *must* ask clarifying questions to gather all required details for both projects and issues (see below).
+3. **Analyze and Compare:**
+   - Parse the PRD and/or task list.
+   - Retrieve the corresponding Linear project and issues.
+   - Compare all relevant fields (titles, summaries, descriptions, tasks, statuses, assignees, labels, structure, etc.).
+   - **Raise a complete, explicit list of all discrepancies** found between local files and Linear (or return a checkmark emoji if all is in sync).
+4. **Resolve Discrepancies:**
+   - For each discrepancy, prompt the user to resolve it. The user can either provide the answer or ask the AI to deduce the correct state from the codebase and context.
+   - Do NOT proceed with any creation or update until all discrepancies are resolved and the user confirms.
+5. **Sync/Create:**
+   - For PRDs: Create or update the Linear project using the provided details and PRD content.
+   - For task lists: Create or update Linear issues/sub-issues using the task list content and mapping.
+6. **Confirm and Summarize:**
+   - After syncing, confirm with the user and provide a summary or links to the updated/created Linear project and issues.
+
+## Clarifying Questions (Examples)
+
+The AI should adapt its questions based on the PRD/task list and user input, but here are common areas to clarify:
+
+* **Team:** "Which Linear team should this project/issues be linked to? (Please provide the team name or ID)"
+* **Project Name:** "What should the project be called in Linear? (Default: PRD title)"
+* **Project Summary:** "Provide a short summary for the Linear project (1-2 sentences). (Default: PRD overview/introduction)"
+* **Target Date:** "Is there a target completion date for this project? (Optional)"
+* **Labels:** "Should any specific labels be added to the project/issues? (Optional)"
+* **Assignees:** "Who should be assigned as the project lead/owner or to specific issues? (Optional)"
+* **Visibility:** "Should the project be public or private in Linear? (Default: private)"
+* **Issue Structure:** "Should sub-tasks be created as separate issues, as checklist items, or as part of the parent issue description? (Default: checklist items)"
+* **Priority:** "Should any tasks be marked as high priority? (Optional)"
+
+## Mapping: PRD/Task List to Linear
+
+### For Projects (PRDs):
+1. **Project Name:** Use the PRD title or a user-specified name.
+2. **Summary:** Use the PRD introduction/overview or a user-specified summary.
+3. **Description:** Attach the full PRD content as the project description in Markdown.
+4. **Team:** Use the specified Linear team.
+5. **Target Date:** Set if provided.
+6. **Labels:** Add any specified labels.
+7. **Assignees:** Assign project lead/owner if specified.
+8. **Visibility:** Set as public or private as specified.
+
+### For Issues (Task Lists):
+1. **Issue Title:** Use the parent task title and keep the numbering of tasks.
+2. **Description:** Use the sub-task details, relevant notes, or context from the task list.
+3. **Project:** Link to the confirmed Linear project.
+4. **Team:** Link to the specified team if provided.
+5. **Assignee:** Assign as specified.
+6. **Labels:** Add any specified labels.
+7. **Checklist/Sub-issues:** If sub-tasks are not created as separate issues, include them as checklist items in the parent issue. If sub-issues are used, ensure correct parent-child relationships.
+8. **Priority:** Set as specified.
+
+## Output
+
+* **Action:** Sync or create Linear projects/issues using the provided details and local content.
+* **Discrepancy Report:** Output a complete, explicit list of all discrepancies found, or a checkmark emoji (✅) if all is in sync.
+* **Confirmation:** Output a summary of the created/updated project/issues and links to them in Linear.
+
+## Final Instructions
+
+1. Do NOT start creating or updating anything in Linear until all clarifying questions are answered and all discrepancies are resolved.
+2. Be explicit and unambiguous in the steps and required information.
+3. If any required information is missing, ask the user before proceeding.
+4. If discrepancies are found, always prompt the user to resolve them (user can answer or ask the AI to deduce from codebase/context).
+5. After sync, confirm with the user and provide a summary/links.
+6. Do NOT start any implementation of the PRD or tasks until sync is confirmed.
