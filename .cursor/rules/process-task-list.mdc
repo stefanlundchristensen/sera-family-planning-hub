@@ -11,10 +11,10 @@ Guidelines for managing task lists in markdown files to track progress on comple
 - **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say “yes” or "y"
 - **Completion protocol:**  
   1. When you finish a **sub‑task**, immediately mark it as completed by changing `[ ]` to `[x]`. 
-  2. When the tasks is marked compleated abvoe please ensure that the relevent **sub-issue** in Linear (if there) is also set to be compleated
+  2. When the task is marked completed above, please ensure that the relevant **sub-issue** in Linear (if there) is also set to be completed (Done).
   3. If **all** subtasks underneath a parent task are now `[x]`, also mark the **parent task** as completed. 
-  4. If a **parent tasks** is marked as compleated please ensure that the relevent issue in Linear is also set to be compleated 
-- Stop after each sub‑task and wait for the user’s go‑ahead.
+  4. If a **parent task** is marked as completed, please ensure that the relevant issue in Linear is also set to be completed (Done).
+- Stop after each sub‑task and wait for the user's go‑ahead.
 
 ## Task List Maintenance
 
@@ -22,9 +22,20 @@ Guidelines for managing task lists in markdown files to track progress on comple
    - Mark tasks and subtasks as completed (`[x]`) per the protocol above.
    - Add new tasks as they emerge.
 
-2. **Maintain the “Relevant Files” section:**
+2. **Maintain the "Relevant Files" section:**
    - List every file created or modified.
    - Give each file a one‑line description of its purpose.
+
+## Linear Sync & Pre-Task Checks
+
+- **Before starting any new sub-task or parent task:**
+  1. Check that the task list and Linear are in sync:
+     - All completed tasks in the task list are also marked as Done in Linear (and vice versa).
+     - All open tasks/sub-tasks in the task list have corresponding issues/sub-issues in Linear (if Linear is being used for this PRD).
+     - If any discrepancies are found, **prompt the user to help resolve the discrepancy**. The user can either provide the answer or ask the AI to deduce the correct state from the codebase and context.
+  2. If a new sub-task is started, ensure a corresponding sub-issue exists in Linear (if using sub-issues).
+  3. If a new parent task is started, ensure a corresponding parent issue exists in Linear.
+  4. All completions and status changes must be reflected in both the task list and Linear.
 
 ## AI Instructions
 
@@ -34,7 +45,8 @@ When working with task lists, the AI must:
 2. Follow the completion protocol:
    - Mark each finished **sub‑task** `[x]`.
    - Mark the **parent task** `[x]` once **all** its subtasks are `[x]`.
+   - Ensure all completions and status changes are reflected in Linear as well.
 3. Add newly discovered tasks.
-4. Keep “Relevant Files” accurate and up to date.
-5. Before starting work, check which sub‑task is next.
+4. Keep "Relevant Files" accurate and up to date.
+5. Before starting work, check which sub‑task is next **and** ensure the task list and Linear are in sync.
 6. After implementing a sub‑task, update the file and then pause for user approval.

@@ -1,14 +1,14 @@
-
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AddFamilyMemberForm } from "@/components/family/AddFamilyMemberForm";
 import { EditFamilyMemberForm } from "@/components/family/EditFamilyMemberForm";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import useCalendarStore from "@/lib/store";
 
 // Updated initial family members with simplified roles, excluding linked calendars
 const INITIAL_FAMILY_MEMBERS = [
@@ -20,15 +20,21 @@ const INITIAL_FAMILY_MEMBERS = [
 ];
 
 const Family = () => {
-  const [familyMembers, setFamilyMembers] = useState(INITIAL_FAMILY_MEMBERS);
+  const familyMembers = useCalendarStore((s) => s.familyMembers);
+  const addFamilyMember = useCalendarStore((s) => s.addFamilyMember);
+  const updateFamilyMember = useCalendarStore((s) => s.updateFamilyMember);
+  const deleteFamilyMember = useCalendarStore((s) => s.deleteFamilyMember);
+  const error = useCalendarStore((s) => s.error);
+
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [isEditMemberOpen, setIsEditMemberOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState<any>(null);
 
   const handleAddMember = (newMember: any) => {
-    setFamilyMembers([...familyMembers, newMember]);
+    addFamilyMember(newMember);
     setIsAddMemberOpen(false);
-    toast.success("Family member added successfully!");
+    if (!error) toast.success("Family member added successfully!");
+    else toast.error(error);
   };
 
   const handleEditMember = (member: any) => {
@@ -37,11 +43,16 @@ const Family = () => {
   };
 
   const handleUpdateMember = (updatedMember: any) => {
-    setFamilyMembers(familyMembers.map(member => 
-      member.id === updatedMember.id ? updatedMember : member
-    ));
+    updateFamilyMember(updatedMember);
     setIsEditMemberOpen(false);
-    toast.success("Family member updated successfully!");
+    if (!error) toast.success("Family member updated successfully!");
+    else toast.error(error);
+  };
+
+  const handleDeleteMember = (id: string) => {
+    deleteFamilyMember(id);
+    if (!error) toast.success("Family member removed.");
+    else toast.error(error);
   };
 
   const getInitials = (name: string) => {
@@ -68,7 +79,7 @@ const Family = () => {
               <TableHead className="w-[80px]">Avatar</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -81,9 +92,12 @@ const Family = () => {
                 </TableCell>
                 <TableCell className="font-medium">{member.name}</TableCell>
                 <TableCell>{member.role}</TableCell>
-                <TableCell>
+                <TableCell className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={() => handleEditMember(member)}>
                     <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteMember(member.id)}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
